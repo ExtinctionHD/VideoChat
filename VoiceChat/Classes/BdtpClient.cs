@@ -21,15 +21,17 @@ using System.ComponentModel;
 
 namespace VoiceChat.Classes
 {
-    class BdtpClient: INotifyPropertyChanged
+    /// <summary>
+    /// Предоставляет сетевые службы по протоколу BDTP (Babey Duplex Transmission Protocol)
+    /// </summary>
+    class BdtpClient : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        public bool IsConnected
+        /// <summary>
+        /// Возвращает значение указывающие установлено ли соединение.
+        /// </summary>
+        public bool Connected
         {
             get
             {
@@ -37,6 +39,9 @@ namespace VoiceChat.Classes
             }
         }
 
+        /// <summary>
+        /// Возвращает IP-адрес с которым установлено соединение.
+        /// </summary>
         public IPAddress RemoteIP
         {
             get
@@ -54,7 +59,7 @@ namespace VoiceChat.Classes
                     thread.Start();
                 }
 
-                RaisePropertyChanged("IsConnected");
+                PropertyChanged(this, new PropertyChangedEventArgs("Connected"));
             }
         }
         private IPAddress remoteIP;
@@ -64,28 +69,52 @@ namespace VoiceChat.Classes
 
         private UdpClient udpSender;
         private UdpClient udpReceiver;
-
+        
+        /// <summary>
+        /// Возвращает или задает номер управляющего порта.
+        /// </summary>
         public int TcpPort { get; set; } = 11000;
-        public int SenderPort { get; set; } = 11001;
-        public int receiverPort { get; set; } = 11002;
 
+        /// <summary>
+        /// Возвращает или задает номер отправляющиего порта.
+        /// </summary>
+        public int SenderPort { get; set; } = 11001;
+
+        /// <summary>
+        /// Возвращает или задает номер принимающего порта.
+        /// </summary>
+        public int ReceiverPort { get; set; } = 11002;
+        
+        /// <summary>
+        /// Возвращает или задает локальный IP-адрес.
+        /// </summary>
         public IPAddress LocalIP { get; set; }
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса BdtpClient и связывает его с заданным локальным IP-адресом.
+        /// </summary>
+        /// <param name="localIP">Объект IPAddress локального узла</param>
         public BdtpClient(IPAddress localIP)
         {
             LocalIP = localIP;
 
             tcpListener = new TcpListener(LocalIP, TcpPort);
-                tcpController = new TcpClient();
+            tcpController = new TcpClient();
             udpSender = new UdpClient(new IPEndPoint(LocalIP, SenderPort));
-            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, receiverPort));
+            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
         }
 
+        /// <summary>
+        /// Подключает клиента к удаленному BDTP-узлу, используя указанный IP-адрес.
+        /// </summary>
+        /// <param name="remoteIP">Объект IPAddress узла, к которому выполняется подключение.</param>
+        /// <returns>true Если удалось установить соединение; в противном случае — false.</returns>
         public bool Connect(IPAddress remoteIP)
         {
-            if (IsConnected)
+            if (Connected)
             {
                 return false;
+
             }
 
             try
@@ -102,10 +131,14 @@ namespace VoiceChat.Classes
             RemoteIP = remoteIP;
             return true;
         }
-
-        public IPAddress Listen()
+        
+        /// <summary>
+        /// Принимает ожидающий запрос на подключение.
+        /// </summary>
+        /// <returns>Объект IPAddress узла, с которого выполнено подключение.</returns>
+        public IPAddress Accept()
         {
-            while (IsConnected) { }
+            while (Connected) { }
 
             tcpListener.Start();
 
@@ -136,20 +169,29 @@ namespace VoiceChat.Classes
             return new IPAddress(bytes);
         }
 
+        /// <summary>
+        /// Отправляет байты данных узлу, с которым установлено соединение.
+        /// </summary>
+        /// <param name="data">Массив объектов типа byte, содержащий данные для отправки.</param>
+        /// <returns>Число успешно отправленных байтов</returns>
         public int Send(byte[] data)
         {
-            if (!IsConnected)
+            if (!Connected)
             {
                 return 0;
             }
 
-            IPEndPoint remoteEP = new IPEndPoint(RemoteIP, receiverPort);
+            IPEndPoint remoteEP = new IPEndPoint(RemoteIP, ReceiverPort);
             return udpSender.Send(data, data.Length, remoteEP);
         }
 
+        /// <summary>
+        /// Возвращает данные, которые были отправлены со связанного удаленного узла.
+        /// </summary>
+        /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
         public byte[] Receive()
         {
-            if (!IsConnected)
+            if (!Connected)
             {
                 return Array.Empty<byte>();
             }
@@ -165,26 +207,21 @@ namespace VoiceChat.Classes
             }
         }
 
+        /// <summary>
+        /// Закрывает подключение с текущим удаленным узлом и позволяет повторно установить соединение.
+        /// </summary>
         public void Disconnect()
         {
-            DisconnectBase();
-        }
+            RemoteIP = null;
 
-        public void Disconnect(Action callback)
-        {
-            DisconnectBase();
-            callback.Invoke();
-        }
-
-        private void DisconnectBase()
-        {
             tcpListener.Stop();
             tcpController.Close();
 
-            udpReceiver.Close();
-            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, receiverPort));
+            Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            socket.Disconnect(true);
 
-            RemoteIP = null;
+            udpReceiver.Close();
+            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
         }
 
         private void WaitForDisconnect()
@@ -201,7 +238,7 @@ namespace VoiceChat.Classes
                 }
                 catch { }
             }
-            while (count != 0 && IsConnected);
+            while (count != 0 && Connected);
 
             Disconnect();
         }

@@ -81,13 +81,13 @@ namespace VoiceChat
         {
             while (true)
             {
-                if (bdtpClient.Listen() != null)
+                if (bdtpClient.Accept() != null)
                 {
                     Dispatcher.Invoke(ShowRemoteIP);
                 }
 
                 output.Play();
-                while (bdtpClient.IsConnected)
+                while (bdtpClient.Connected)
                 {
                     byte[] data = bdtpClient.Receive();
                     bufferStream.AddSamples(data, 0, data.Length);

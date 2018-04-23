@@ -51,7 +51,7 @@
                  Grid.Row="1"
                  Margin="-40, 5, 0, 0"
                  Fill="Red"
-                 Visibility="{Binding Path=IsConnected, Converter={StaticResource BoolToVis}}"/>
+                 Visibility="{Binding Path=Connected, Converter={StaticResource BoolToVis}}"/>
 
         <Button x:Name="btnSend"
                 Background="Lime"
