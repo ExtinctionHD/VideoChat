@@ -27,6 +27,10 @@ namespace VoiceChat.Classes
     class BdtpClient : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string PropertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        }
 
         /// <summary>
         /// Возвращает значение указывающие установлено ли соединение.
@@ -59,7 +63,7 @@ namespace VoiceChat.Classes
                     thread.Start();
                 }
 
-                PropertyChanged(this, new PropertyChangedEventArgs("Connected"));
+                OnPropertyChanged("Connected");
             }
         }
         private IPAddress remoteIP;
@@ -71,19 +75,19 @@ namespace VoiceChat.Classes
         private UdpClient udpReceiver;
         
         /// <summary>
-        /// Возвращает или задает номер управляющего порта.
+        /// Возвращает номер управляющего порта.
         /// </summary>
-        public int TcpPort { get; set; } = 11000;
+        public int TcpPort { get; private set; } = 11000;
 
         /// <summary>
-        /// Возвращает или задает номер отправляющиего порта.
+        /// Возвращает номер отправляющиего порта.
         /// </summary>
-        public int SenderPort { get; set; } = 11001;
+        public int SenderPort { get; private set; } = 11001;
 
         /// <summary>
-        /// Возвращает или задает номер принимающего порта.
+        /// Возвращает номер принимающего порта.
         /// </summary>
-        public int ReceiverPort { get; set; } = 11002;
+        public int ReceiverPort { get; private set; } = 11002;
         
         /// <summary>
         /// Возвращает или задает локальный IP-адрес.
@@ -98,6 +102,29 @@ namespace VoiceChat.Classes
         {
             LocalIP = localIP;
 
+            InitializeClient();
+        }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр класса BdtpClient с заданными портами и связывает его с заданным локальным IP-адресом.
+        /// </summary>
+        /// <param name="localIP">Объект IPAddress локального узла.</param>
+        /// <param name="tcpPort">Номер управляющего порта.</param>
+        /// <param name="receiverPort">Номер порта для принятия данных.</param>
+        /// <param name="senderPort">Номер порта для отправления данных.</param>
+        public BdtpClient(IPAddress localIP, int tcpPort, int receiverPort, int senderPort)
+        {
+            LocalIP = localIP;
+
+            TcpPort = tcpPort;
+            ReceiverPort = receiverPort;
+            SenderPort = senderPort;
+
+            InitializeClient();
+        }
+
+        private void InitializeClient()
+        {
             tcpListener = new TcpListener(LocalIP, TcpPort);
             tcpController = new TcpClient();
             udpSender = new UdpClient(new IPEndPoint(LocalIP, SenderPort));
@@ -216,9 +243,6 @@ namespace VoiceChat.Classes
 
             tcpListener.Stop();
             tcpController.Close();
-
-            Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            socket.Disconnect(true);
 
             udpReceiver.Close();
             udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
