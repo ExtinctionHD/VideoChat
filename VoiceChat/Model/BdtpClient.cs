@@ -19,18 +19,17 @@ using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using System.ComponentModel;
 
-namespace VoiceChat.Classes
+namespace BDTP
 {
     /// <summary>
     /// Предоставляет сетевые службы по протоколу BDTP (Babey Duplex Transmission Protocol)
     /// </summary>
-    class BdtpClient : INotifyPropertyChanged
+    public class BdtpClient
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string PropertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
-        }
+        /// <summary>
+        /// Представляет размер буфера для подтверждений
+        /// </summary>
+        public const int BUFFER_SIZE = 1024;
 
         /// <summary>
         /// Возвращает значение указывающие установлено ли соединение.
@@ -41,18 +40,19 @@ namespace VoiceChat.Classes
             {
                 return RemoteIP != null;
             }
+            
         }
 
         /// <summary>
         /// Возвращает IP-адрес с которым установлено соединение.
         /// </summary>
-        public IPAddress RemoteIP
+        public virtual IPAddress RemoteIP
         {
             get
             {
                 return remoteIP;
             }
-            private set
+            protected set
             {
                 remoteIP = value;
 
@@ -62,11 +62,14 @@ namespace VoiceChat.Classes
                     Thread thread = new Thread(new ThreadStart(WaitForDisconnect));
                     thread.Start();
                 }
-
-                OnPropertyChanged("Connected");
             }
         }
         private IPAddress remoteIP;
+
+        /// <summary>
+        /// Возвращает связанный локальный IP-адрес.
+        /// </summary>
+        public IPAddress LocalIP { get; private set; }
 
         private TcpListener tcpListener;
         private TcpClient tcpController;
@@ -88,11 +91,6 @@ namespace VoiceChat.Classes
         /// Возвращает номер принимающего порта.
         /// </summary>
         public int ReceiverPort { get; private set; } = 11002;
-        
-        /// <summary>
-        /// Возвращает или задает локальный IP-адрес.
-        /// </summary>
-        public IPAddress LocalIP { get; set; }
 
         /// <summary>
         /// Инициализирует новый экземпляр класса BdtpClient и связывает его с заданным локальным IP-адресом.
@@ -136,7 +134,7 @@ namespace VoiceChat.Classes
         /// </summary>
         /// <param name="remoteIP">Объект IPAddress узла, к которому выполняется подключение.</param>
         /// <returns>true Если удалось установить соединение; в противном случае — false.</returns>
-        public bool Connect(IPAddress remoteIP)
+        public virtual bool Connect(IPAddress remoteIP)
         {
             if (Connected)
             {
@@ -151,19 +149,17 @@ namespace VoiceChat.Classes
             }
             catch { return false; }
 
-            NetworkStream stream = tcpController.GetStream();
-            byte[] bytes = LocalIP.GetAddressBytes();
-            stream.Write(bytes, 0, bytes.Length);
+            SendReceipt(LocalIP.GetAddressBytes());
 
             RemoteIP = remoteIP;
             return true;
         }
-        
+
         /// <summary>
         /// Принимает ожидающий запрос на подключение.
         /// </summary>
-        /// <returns>Объект IPAddress узла, с которого выполнено подключение.</returns>
-        public IPAddress Accept()
+        /// <returns>true Если удалось принять соединение; в противном случае — false.</returns>
+        public virtual bool Accept()
         {
             while (Connected) { }
 
@@ -173,35 +169,19 @@ namespace VoiceChat.Classes
             {
                 tcpController = tcpListener.AcceptTcpClient();
             }
-            catch { return null; }
+            catch { return false; }
 
-            RemoteIP = GetIPAddress(tcpController.GetStream());
-            return RemoteIP;
-        }
+            RemoteIP = new IPAddress(ReceiveReceipt());
 
-        private IPAddress GetIPAddress(NetworkStream stream)
-        {
-            byte[] buffer = new byte[256];
-            int count = 0;
-
-            do
-            {
-                count += stream.Read(buffer, count, buffer.Length);
-            }
-            while (stream.DataAvailable);
-
-            byte[] bytes = new byte[count];
-            Array.Copy(buffer, bytes, count);
-
-            return new IPAddress(bytes);
+            return true;
         }
 
         /// <summary>
-        /// Отправляет байты данных узлу, с которым установлено соединение.
+        /// Отправляет байты данных по протоколу UDP, узлу, с которым установлено соединение.
         /// </summary>
         /// <param name="data">Массив объектов типа byte, содержащий данные для отправки.</param>
         /// <returns>Число успешно отправленных байтов</returns>
-        public int Send(byte[] data)
+        public virtual int Send(byte[] data)
         {
             if (!Connected)
             {
@@ -213,10 +193,10 @@ namespace VoiceChat.Classes
         }
 
         /// <summary>
-        /// Возвращает данные, которые были отправлены со связанного удаленного узла.
+        /// Возвращает данные, которые были отправлены со связанного узла по протоколу UDP.
         /// </summary>
         /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
-        public byte[] Receive()
+        public virtual byte[] Receive()
         {
             if (!Connected)
             {
@@ -235,9 +215,57 @@ namespace VoiceChat.Classes
         }
 
         /// <summary>
+        /// Отправляет подтверждение по протоколу TCP, узлу, с которым установлено соединение.
+        /// </summary>
+        /// <param name="data">Массив объектов типа byte, содержащий данные для отправки.</param>
+        /// <returns>true Если удалось отправить данные; в противном случае — false.</returns>
+        public virtual bool SendReceipt(byte[] data)
+        {
+            if (!Connected || data.Length > BUFFER_SIZE)
+            {
+                return false;
+            }
+
+            NetworkStream stream = tcpController.GetStream();
+            stream.Write(data, 0, data.Length);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Возвращает подтверждение, которое было отправлено со связанного узла по протоколу TCP.
+        /// </summary>
+        /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
+        public virtual byte[] ReceiveReceipt()
+        {
+            if (!Connected)
+            {
+                return Array.Empty<byte>();
+            }
+
+            NetworkStream stream = tcpController.GetStream();
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int count;
+
+            try
+            {
+                count = stream.Read(buffer, 0, BUFFER_SIZE);
+            }
+            catch
+            {
+                return Array.Empty<byte>();
+            }
+
+            byte[] result = new byte[count];
+            Array.Copy(buffer, result, count);
+
+            return result;
+        }
+
+        /// <summary>
         /// Закрывает подключение с текущим удаленным узлом и позволяет повторно установить соединение.
         /// </summary>
-        public void Disconnect()
+        public virtual void Disconnect()
         {
             RemoteIP = null;
 
