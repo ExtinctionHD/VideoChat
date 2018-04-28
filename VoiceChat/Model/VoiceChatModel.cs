@@ -33,7 +33,8 @@ namespace VoiceChat.Model
         public enum States
         {
             Wait,
-            Call,
+            IncomingCall,
+            OutcomingCall,
             Talk
         }
 
@@ -41,9 +42,9 @@ namespace VoiceChat.Model
         private Thread waitCall;
         private Thread receiveVoice;
         
-        private WaveIn input;                       // Поток записи
-        private WaveOut output;                     // Поток воспроизведения
-        private BufferedWaveProvider bufferStream;  // Беферный поток для передачи через сеть
+        private WaveIn input;                       
+        private WaveOut output;                     
+        private BufferedWaveProvider bufferStream;  
 
         public IPAddress RemoteIP
         {
@@ -107,7 +108,9 @@ namespace VoiceChat.Model
         public VoiceChatModel()
         {
             bdtpClient = new NotifyBdtpClient(GetLocalIP());
+
             InitializeAudio();
+
             waitCall = new Thread(WaitCall);
             waitCall.Start();
         }
@@ -131,9 +134,9 @@ namespace VoiceChat.Model
             return addresses.Where(x => x.AddressFamily == AddressFamily.InterNetwork).Last();
         }
 
-        public void StartCall(IPAddress remoteIP)
+        public void BeginCall()
         {
-            State = States.Call;
+            State = States.IncomingCall;
             bdtpClient.Connect(remoteIP);
             WaitAccept();
         }
@@ -166,7 +169,7 @@ namespace VoiceChat.Model
         {
             if (bdtpClient.Accept())
             {
-                State = States.Call;
+                State = States.IncomingCall;
             }
         }
 

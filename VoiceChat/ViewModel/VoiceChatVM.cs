@@ -26,15 +26,41 @@ namespace VoiceChat.ViewModel
     {
         private VoiceChatModel model;
 
+        public bool WaitCall
+        {
+            get
+            {
+                return model.State == VoiceChatModel.States.Wait;
+            }
+        }
+
         public string LocalIP
         {
             get
             {
                 return model.LocalIP.ToString();
             }
+            set { }
+        }
+
+        public string RemoteIP
+        {
+            get
+            {
+                return model.RemoteIP?.ToString();
+            }
+            set
+            {
+                model.RemoteIP = IPAddress.Parse(value);
+            }
         }
 
         public VoiceChatVM() => model = new VoiceChatModel();
+
+        public void BeginCall(object sender, EventArgs e)
+        {
+            model.BeginCall();
+        }
 
         public void Closing(object sender, EventArgs e)
         {

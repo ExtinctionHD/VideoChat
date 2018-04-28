@@ -12,29 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Net;
-using System.Threading;
-using System.Net.Sockets;
-using NAudio.Wave;
-using NAudio.CoreAudioApi;
-using VoiceChat.ViewModel;
 
 namespace VoiceChat.View
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Логика взаимодействия для BeginCall.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class WaitCall : UserControl
     {
-        public MainWindow()
+        public WaitCall()
         {
             InitializeComponent();
-
-            VoiceChatVM viewModel = new VoiceChatVM();
-
-            Closing += viewModel.Closing;
-
-            DataContext = viewModel;
         }
     }
 }

@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceChat", "VoiceChat\VoiceChat.csproj", "{663467C3-7465-4301-BDF9-FAD4CE6F5BCF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDTP", "BDTP\BDTP.csproj", "{096A7C54-F74E-4D7E-9C3F-0FE1E3A87B7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{663467C3-7465-4301-BDF9-FAD4CE6F5BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{663467C3-7465-4301-BDF9-FAD4CE6F5BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{663467C3-7465-4301-BDF9-FAD4CE6F5BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{096A7C54-F74E-4D7E-9C3F-0FE1E3A87B7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{096A7C54-F74E-4D7E-9C3F-0FE1E3A87B7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{096A7C54-F74E-4D7E-9C3F-0FE1E3A87B7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{096A7C54-F74E-4D7E-9C3F-0FE1E3A87B7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
