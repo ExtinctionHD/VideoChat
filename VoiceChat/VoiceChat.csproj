@@ -75,6 +75,7 @@
     </Page>
     <Compile Include="Model\NotifyBdtpClient.cs" />
     <Compile Include="Model\VoiceChatModel.cs" />
+    <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\VoiceChatVM.cs" />
     <Compile Include="View\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

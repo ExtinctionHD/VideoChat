@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:VoiceChat.View"
+        xmlns:View="clr-namespace:VoiceChat.View"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -15,6 +15,6 @@
         Height="490"
         FontSize="20">
     <Grid>
-        <local:WaitCall/>
+        <View:WaitCall/>
     </Grid>
 </Window>

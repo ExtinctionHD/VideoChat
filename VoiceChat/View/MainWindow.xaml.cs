@@ -30,11 +30,10 @@ namespace VoiceChat.View
         {
             InitializeComponent();
 
-            VoiceChatVM viewModel = new VoiceChatVM();
+            VoiceChatVM vm = new VoiceChatVM();
+            DataContext = vm;
 
-            Closing += viewModel.Closing;
-
-            DataContext = viewModel;
+            Closing += vm.Closing_Executed;
         }
     }
 }

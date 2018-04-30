@@ -146,11 +146,10 @@ namespace BDTP
         public virtual bool Accept()
         {
             while (Connected) { }
-
-            tcpListener.Start();
-
+            
             try
             {
+                tcpListener.Start();
                 tcpController = tcpListener.AcceptTcpClient();
             }
             catch { return false; }

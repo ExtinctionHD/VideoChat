@@ -26,13 +26,41 @@ namespace VoiceChat.ViewModel
     {
         private VoiceChatModel model;
 
+        #region ModelStates
+
         public bool WaitCall
         {
             get
             {
-                return model.State == VoiceChatModel.States.Wait;
+                return model.State == VoiceChatModel.States.WaitCall;
             }
         }
+
+        public bool IncomingCall
+        {
+            get
+            {
+                return model.State == VoiceChatModel.States.IncomingCall;
+            }
+        }
+
+        public bool OutcomingCall
+        {
+            get
+            {
+                return model.State == VoiceChatModel.States.OutcomingCall;
+            }
+        }
+
+        public bool Talk
+        {
+            get
+            {
+                return model.State == VoiceChatModel.States.Talk;
+            }
+        }
+
+        #endregion
 
         public string LocalIP
         {
@@ -51,18 +79,34 @@ namespace VoiceChat.ViewModel
             }
             set
             {
-                model.RemoteIP = IPAddress.Parse(value);
+                try
+                {
+                    model.RemoteIP = IPAddress.Parse(value);
+                }
+                catch { model.RemoteIP = null; }
             }
         }
 
-        public VoiceChatVM() => model = new VoiceChatModel();
+        public VoiceChatVM()
+        {
+            model = new VoiceChatModel();
+            InitializeCommands();
+        }
 
-        public void BeginCall(object sender, EventArgs e)
+        private void InitializeCommands()
+        {
+            BeginCall = new Command(BeginCall_Executed);
+        }
+
+        // Команда вызова
+        public Command BeginCall { get; set; }
+        public void BeginCall_Executed(object parameter)
         {
             model.BeginCall();
         }
-
-        public void Closing(object sender, EventArgs e)
+        
+        // Закрытие приложения
+        public void Closing_Executed(object sender, EventArgs e)
         {
             model.Closing();
         }

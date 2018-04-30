@@ -21,18 +21,18 @@ using System.ComponentModel;
 
 namespace VoiceChat.Model
 {
-    /// <summary>
-    /// Представляет данные и логику работы приложения
-    /// </summary>
     public class VoiceChatModel: INotifyPropertyChanged
     {
+        // Подтверждения
         private enum Receipts
         {
             Accept
         }
+
+        // Состояния модели
         public enum States
         {
-            Wait,
+            WaitCall,
             IncomingCall,
             OutcomingCall,
             Talk
@@ -68,51 +68,21 @@ namespace VoiceChat.Model
             }
         }
 
-        public States State
-        {
-            get
-            {
-                return state;
-            }
-            private set
-            {
-                state = value;
-                if (state == States.Talk)
-                {
-                    StartSendVoice();
-                    output.Play();
-                    receiveVoice = new Thread(ReceiveVoice);
-                    receiveVoice.Start();
-                }
-                else
-                {
-                    EndSendVoice();
-                    output.Stop();
-                }
-            }
-        }
-        private States state;
+        // Текущее состояние
+        public States State { get; private set; }
 
-        /// <summary>
-        /// Событие возникающее при изменении свойства объекта.
-        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string PropertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
         }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса VoiceChatModel
-        /// </summary>
+        
         public VoiceChatModel()
         {
             bdtpClient = new NotifyBdtpClient(GetLocalIP());
-
             InitializeAudio();
 
-            waitCall = new Thread(WaitCall);
-            waitCall.Start();
+            StartWaitCall();
         }
 
         private void InitializeAudio()
@@ -134,38 +104,72 @@ namespace VoiceChat.Model
             return addresses.Where(x => x.AddressFamily == AddressFamily.InterNetwork).Last();
         }
 
+        // Исходящий вызов
         public void BeginCall()
         {
-            State = States.IncomingCall;
-            bdtpClient.Connect(remoteIP);
-            WaitAccept();
-        }
+            State = States.OutcomingCall;
 
-        private void WaitAccept()
+            EndWaitCall();
+            
+            // Подключение о ожидание ответа
+            if (bdtpClient.Connect(remoteIP) && WaitAccept())
+            {
+                StartSendVoice();
+                StartReceiveVoice();
+            }
+            else
+            {
+                StartWaitCall();
+            }
+        }
+        private bool WaitAccept()
         {
-            while (bdtpClient.ReceiveReceipt() != new byte[] { (byte)Receipts.Accept }) ;
-            State = States.Talk;
-        }
+            try
+            {
+                while (bdtpClient.ReceiveReceipt() != new byte[] { (byte)Receipts.Accept }) ;
+            }
+            catch { return false; }
 
+            State = States.Talk;
+            return true;
+        }
         public void EndCall()
         {
+            EndSendVoice();
+            EndReceiveVoice();
+
             bdtpClient.Disconnect();
-            State = States.Wait;
+
+            StartWaitCall();
         }
 
+        // Входящий вызов
         public void AcceptCall()
         {
-            bdtpClient.SendReceipt(new byte[] { (byte)Receipts.Accept });
-            State = States.Talk;
+            if (bdtpClient.SendReceipt(new byte[] { (byte)Receipts.Accept }))
+            {
+                State = States.Talk;
+            }
         }
-
         public void DeclineCall()
         {
             bdtpClient.Disconnect();
-            State = States.Wait;
         }
 
-        public void WaitCall()
+        // Ожидания входящего вызова
+        public void StartWaitCall()
+        {
+            State = States.WaitCall;
+
+            waitCall = new Thread(WaitCall);
+            waitCall.Start();
+        }
+        public void EndWaitCall()
+        {
+            bdtpClient.Disconnect();    // Добавить StopAccept в BdtpClient
+            waitCall?.Abort();
+        }
+        private void WaitCall()
         {
             if (bdtpClient.Accept())
             {
@@ -173,18 +177,17 @@ namespace VoiceChat.Model
             }
         }
 
+        // Передачи звука
         public void StartSendVoice()
         {
             input.DataAvailable += SendVoice;
             input.StartRecording();
         }
-
         public void EndSendVoice()
         {
             input.StopRecording();
             input.DataAvailable -= SendVoice;
         }
-
         private void SendVoice(object sender, WaveInEventArgs e)
         {
             if (State != States.Talk)
@@ -194,10 +197,22 @@ namespace VoiceChat.Model
 
             bdtpClient.Send(e.Buffer);
         }
-
-        public void ReceiveVoice()
+        
+        // Приема звука
+        public void StartReceiveVoice()
         {
-            while(State == States.Talk)
+            output.Play();
+            receiveVoice = new Thread(ReceiveVoice);
+            receiveVoice.Start();
+        }
+        public void EndReceiveVoice()
+        {
+            receiveVoice?.Abort();
+            output.Stop();
+        }
+        private void ReceiveVoice()
+        {
+            while(bdtpClient.Connected)
             {
                 byte[] data = bdtpClient.Receive();
                 bufferStream.AddSamples(data, 0, data.Length);
@@ -205,11 +220,11 @@ namespace VoiceChat.Model
             }
         }
 
+        // Закрытие модели
         public void Closing()
         {
             EndCall();
-            waitCall?.Abort();
-            receiveVoice?.Abort();
+            EndWaitCall();
         }
     }
 }
