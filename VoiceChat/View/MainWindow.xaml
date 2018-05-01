@@ -6,7 +6,7 @@
         xmlns:View="clr-namespace:VoiceChat.View"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}"
+        Background="#FFFAFAFA"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="/VoiceChat;component/View/Fonts/#Montserrat"
@@ -16,5 +16,6 @@
         FontSize="20">
     <Grid>
         <View:WaitCall/>
+        <View:OutcomingCall/>
     </Grid>
 </Window>

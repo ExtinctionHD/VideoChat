@@ -160,6 +160,14 @@ namespace BDTP
         }
 
         /// <summary>
+        /// Прекращает ожидание входящего запроса на подключение
+        /// </summary>
+        public virtual void StopAccept()
+        {
+            tcpListener.Stop();
+        }
+
+        /// <summary>
         /// Отправляет байты данных по протоколу UDP, узлу, с которым установлено соединение.
         /// </summary>
         /// <param name="data">Массив объектов типа byte, содержащий данные для отправки.</param>
