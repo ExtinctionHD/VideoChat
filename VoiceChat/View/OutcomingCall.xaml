@@ -10,27 +10,36 @@
              Visibility="{Binding OutcomingCall, Converter={StaticResource BoolToVis}}">
     <Grid Margin="0, 25">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.6*"/>
-            <RowDefinition Height="1.4*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="0.6*"/>
         </Grid.RowDefinitions>
 
-        <Border VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Padding="16,4"
-                BorderBrush="#FF3F51B5"
-                BorderThickness="1"
-                CornerRadius="3">
-            
-            <TextBlock Text="{Binding Path=RemoteIP}"
-                       FontSize="26"/>
-            
-        </Border>
+        <Grid HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-        <Image gif:ImageBehavior.AnimatedSource="Images/CallAnimation.gif"
-               gif:ImageBehavior.RepeatBehavior="Forever"
-               Grid.Row="1"
-               Margin="20"/>
+            <Image gif:ImageBehavior.AnimatedSource="Images/CallAnimation.gif"
+                   gif:ImageBehavior.RepeatBehavior="Forever"
+                   Grid.Row="0"
+                   Margin="0, 35, 0, 5"/>
+
+            <TextBlock Text="Connecting to"
+                       HorizontalAlignment="Center"
+                       Grid.Row="1"
+                       FontSize="16"
+                       Margin="0, 5"/>
+
+            <TextBlock Text="{Binding Path=RemoteIP}"
+                     Grid.Row="2"
+                     FontSize="28"
+                     Width="auto"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"/>
+        </Grid>
 
         <Button HorizontalAlignment="Center"
                 Content="END CALL"

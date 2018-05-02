@@ -119,10 +119,9 @@ namespace VoiceChat.Model
         // Исходящий вызов
         public async void BeginCall()
         {
+            State = States.OutcomingCall;
             await Task.Run(() =>
             {
-                State = States.OutcomingCall;
-
                 EndWaitCall();
 
                 // Подключение о ожидание ответа
