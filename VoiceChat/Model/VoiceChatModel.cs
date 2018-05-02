@@ -94,7 +94,7 @@ namespace VoiceChat.Model
             bdtpClient = new NotifyBdtpClient(GetLocalIP());
             InitializeAudio();
 
-            StartWaitCall();
+            BeginWaitCall();
         }
 
         private void InitializeAudio()
@@ -119,21 +119,20 @@ namespace VoiceChat.Model
         // Исходящий вызов
         public async void BeginCall()
         {
-            State = States.OutcomingCall;
-
             await Task.Run(() =>
             {
+                State = States.OutcomingCall;
+
                 EndWaitCall();
 
                 // Подключение о ожидание ответа
                 if (bdtpClient.Connect(remoteIP) && WaitAccept())
                 {
-                    StartSendVoice();
-                    StartReceiveVoice();
+                    BeginTalk();
                 }
                 else
                 {
-                    StartWaitCall();
+                    EndCall();
                 }
             });
         }
@@ -150,12 +149,11 @@ namespace VoiceChat.Model
         }
         public void EndCall()
         {
-            EndSendVoice();
-            EndReceiveVoice();
+            EndTalk();
 
             bdtpClient.Disconnect();
 
-            StartWaitCall();
+            BeginWaitCall();
         }
 
         // Входящий вызов
@@ -163,22 +161,21 @@ namespace VoiceChat.Model
         {
             if (bdtpClient.SendReceipt(new byte[] { (byte)Receipts.Accept }))
             {
-                State = States.Talk;
+                BeginTalk();
             }
         }
         public void DeclineCall()
         {
             bdtpClient.Disconnect();
 
-            StartWaitCall();
+            BeginWaitCall();
         }
 
-        // Ожидания входящего вызова
-        private void StartWaitCall()
+        // Ожидание входящего вызова
+        private void BeginWaitCall()
         {
             State = States.WaitCall;
-
-            waitCall?.Abort();
+            
             waitCall = new Thread(WaitCall);
             waitCall.Start();
         }
@@ -195,17 +192,32 @@ namespace VoiceChat.Model
             }
         }
 
-        // Передачи звука
-        private void StartSendVoice()
+        // Разговор
+        private void BeginTalk()
         {
+            State = States.Talk;
+
+            // Передача звука
             input.DataAvailable += SendVoice;
             input.StartRecording();
+
+            // Принятие звука
+            output.Play();
+            receiveVoice = new Thread(ReceiveVoice);
+            receiveVoice.Start();
         }
-        private void EndSendVoice()
+        private void EndTalk()
         {
+            // Передача звука
             input.StopRecording();
             input.DataAvailable -= SendVoice;
+
+            // Принятие звука
+            receiveVoice?.Abort();
+            output.Stop();
         }
+
+        // Передачи звука
         private void SendVoice(object sender, WaveInEventArgs e)
         {
             if (State != States.Talk)
@@ -215,19 +227,7 @@ namespace VoiceChat.Model
 
             bdtpClient.Send(e.Buffer);
         }
-
         // Приема звука
-        private void StartReceiveVoice()
-        {
-            output.Play();
-            receiveVoice = new Thread(ReceiveVoice);
-            receiveVoice.Start();
-        }
-        private void EndReceiveVoice()
-        {
-            receiveVoice?.Abort();
-            output.Stop();
-        }
         private void ReceiveVoice()
         {
             while(bdtpClient.Connected)

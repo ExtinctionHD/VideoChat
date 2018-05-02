@@ -7,12 +7,12 @@
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="#FFFAFAFA"
-        TextElement.FontWeight="Medium"
+        TextElement.FontWeight="Normal"
         TextElement.FontSize="14"
-        FontFamily="/VoiceChat;component/View/Fonts/#Montserrat"
+        FontFamily="pack://application:,,,/MateriaDesign.Wpf;component/Resources/Roboto/#Roboto"
         Title="MainWindow"
         Width="720"
-        Height="490"
+        Height="480"
         FontSize="20">
     <Grid>
         <View:WaitCall/>
