@@ -27,7 +27,7 @@
 
             <TextBox Text="{Binding Path=LocalIP}"
                      IsReadOnly="True"
-                     Width="240"
+                     Width="210"
                      Grid.Row="1"
                      FontSize="28"
                      VerticalAlignment="Center"/>
@@ -45,7 +45,7 @@
                        FontSize="16"
                        Margin="0, 5"/>
 
-            <TextBox Width="240"
+            <TextBox Width="210"
                      Text="{Binding Path=RemoteIP}"
                      Grid.Row="1"
                      FontSize="28"

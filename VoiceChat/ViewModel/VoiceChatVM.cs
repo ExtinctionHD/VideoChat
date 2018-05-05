@@ -93,7 +93,6 @@ namespace VoiceChat.ViewModel
         public VoiceChatVM()
         {
             model = new VoiceChatModel();
-
             model.PropertyChanged += VM_StatesChanged;
 
             InitializeCommands();
@@ -122,14 +121,14 @@ namespace VoiceChat.ViewModel
 
         // Команда вызова
         public Command BeginCall { get; set; }
-        public void BeginCall_Executed(object parameter)
+        private void BeginCall_Executed(object parameter)
         {
             model.BeginCall();
         }
 
         // Команда завершения вызова
         public Command EndCall { get; set; }
-        public void EndCall_Executed(object parameter)
+        private void EndCall_Executed(object parameter)
         {
             model.EndCall();
         }

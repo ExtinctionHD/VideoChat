@@ -6,16 +6,29 @@
         xmlns:View="clr-namespace:VoiceChat.View"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="#FFFAFAFA"
         TextElement.FontWeight="Normal"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MateriaDesign.Wpf;component/Resources/Roboto/#Roboto"
         Title="MainWindow"
         Width="720"
         Height="490"
-        FontSize="20">
+        FontSize="20"
+        Background="#FF1D1E23">
     <Grid>
-        <View:WaitCall/>
-        <View:OutcomingCall/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="210"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Image HorizontalAlignment="Center"
+               VerticalAlignment="Bottom"
+               Grid.Column="2"
+               Source="Images/Bg.jpg"
+               Margin="20, 100, 20, 0"/>
+
+
+        <View:WaitCall Grid.ColumnSpan="3"/>
+        <View:OutcomingCall Grid.ColumnSpan="3"/>
     </Grid>
 </Window>
