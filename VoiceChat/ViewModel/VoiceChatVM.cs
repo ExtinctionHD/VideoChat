@@ -34,7 +34,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.WaitCall;
+                return model.State == VoiceChatModel.States.IncomingCall;
             }
         }
 
@@ -50,7 +50,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.IncomingCall;
+                return model.State == VoiceChatModel.States.WaitCall;
             }
         }
 

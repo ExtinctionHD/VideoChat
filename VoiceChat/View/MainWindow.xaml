@@ -28,7 +28,11 @@
                Margin="20, 100, 20, 0"/>
 
 
-        <View:WaitCall Grid.ColumnSpan="3"/>
-        <View:OutcomingCall Grid.ColumnSpan="3"/>
+        <View:WaitCall Grid.ColumnSpan="3"
+                       Visibility="{Binding WaitCall, Converter={StaticResource BoolToVis}}"/>
+        <View:OutcomingCall Grid.ColumnSpan="3"
+                            Visibility="{Binding OutcomingCall, Converter={StaticResource BoolToVis}}"/>
+        <View:IncomingCall Grid.ColumnSpan="3"
+                           Visibility="{Binding IncomingCall, Converter={StaticResource BoolToVis}}"/>
     </Grid>
 </Window>

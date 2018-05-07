@@ -144,9 +144,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="View\Images\CallAnimation.gif" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="View\Images\Bg.jpg" />
   </ItemGroup>
   <ItemGroup>
