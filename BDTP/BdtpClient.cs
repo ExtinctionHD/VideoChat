@@ -42,7 +42,7 @@ namespace BDTP
                 if (value != null)
                 {
                     tcpListener?.Stop();
-                    Thread thread = new Thread(new ThreadStart(WaitForDisconnect));
+                    Thread thread = new Thread(new ThreadStart(WaitReceipt));
                     thread.Start();
                 }
             }
@@ -74,6 +74,11 @@ namespace BDTP
         /// Возвращает номер принимающего порта.
         /// </summary>
         public int ReceiverPort { get; private set; } = 11002;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event Action<byte[]> ReceiptReceived;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса BdtpClient и связывает его с заданным локальным IP-адресом.
@@ -268,18 +273,17 @@ namespace BDTP
         /// <summary>
         /// Ожидает закрытие соединения со стороны удаленного узла и позволяет повторно установить соединение.
         /// </summary>
-        protected virtual void WaitForDisconnect()
+        protected virtual void WaitReceipt()
         {
-            NetworkStream stream = tcpController.GetStream();
-
             int count = 0;
             do
             {
-                count = ReceiveReceipt().Length;
-            }
-            while (count != 0 && Connected);
+                byte[] buffer = ReceiveReceipt();
+                count = buffer.Length;
 
-            Disconnect();
+                ReceiptReceived(buffer);
+            }
+            while (Connected);
         }
     }
 }
