@@ -34,7 +34,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.IncomingCall;
+                return model.State == VoiceChatModel.States.WaitCall;
             }
         }
 
@@ -50,7 +50,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.WaitCall;
+                return model.State == VoiceChatModel.States.IncomingCall;
             }
         }
 
@@ -104,6 +104,7 @@ namespace VoiceChat.ViewModel
             OnPropertyChanged("OutcomingCall");
             OnPropertyChanged("IncomingCall");
             OnPropertyChanged("Talk");
+            OnPropertyChanged("RemoteIP");
         }
 
         // Привязка событий к командам
@@ -111,6 +112,8 @@ namespace VoiceChat.ViewModel
         {
             BeginCall = new Command(BeginCall_Executed);
             EndCall = new Command(EndCall_Executed);
+            AcceptCall = new Command(AcceptCall_Executed);
+            DeclineCall = new Command(DeclineCall_Executed);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -121,9 +124,9 @@ namespace VoiceChat.ViewModel
 
         // Команда вызова
         public Command BeginCall { get; set; }
-        private void BeginCall_Executed(object parameter)
+        private async void BeginCall_Executed(object parameter)
         {
-            model.BeginCall();
+            await Task.Run(() => model.BeginCall());
         }
 
         // Команда завершения вызова
@@ -131,6 +134,20 @@ namespace VoiceChat.ViewModel
         private void EndCall_Executed(object parameter)
         {
             model.EndCall();
+        }
+
+        // Команда завершения вызова
+        public Command AcceptCall { get; set; }
+        private void AcceptCall_Executed(object parameter)
+        {
+            model.AcceptCall();
+        }
+
+        // Команда завершения вызова
+        public Command DeclineCall { get; set; }
+        private void DeclineCall_Executed(object parameter)
+        {
+            model.DeclineCall();
         }
 
         // Закрытие приложения

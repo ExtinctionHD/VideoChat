@@ -29,7 +29,7 @@
                        FontSize="16"
                        Margin="0, 5"/>
 
-            <TextBox Text="{Binding RemoteIP}"
+            <TextBox Text="{Binding Path=RemoteIP}"
                      IsReadOnly="True"
                      Grid.Row="1"
                      FontSize="28"
@@ -59,7 +59,8 @@
                         Background="Red"
                         BorderBrush="Red"
                         Height="{Binding Width, RelativeSource={RelativeSource Self}}"
-                        Width="50">
+                        Width="50"
+                        Command="{Binding Path=DeclineCall}">
                     <Image Source="Images/Decline.png"
                            Margin="8"/>
                     <Button.Triggers>
@@ -103,7 +104,7 @@
                         BorderBrush="LimeGreen"
                         Width="50"
                         Height="{Binding Width, RelativeSource={RelativeSource Self}}"
-                        >
+                        Command="{Binding Path=AcceptCall}">
                     <Image Source="Images/Accept.png"
                            Margin="8"/>
                     <Button.Triggers>

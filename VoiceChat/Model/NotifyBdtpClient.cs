@@ -30,6 +30,8 @@ namespace VoiceChat.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
         }
 
+        public event Action Disconnected;
+
         public override IPAddress RemoteIP
         {
             get => base.RemoteIP;
@@ -42,5 +44,12 @@ namespace VoiceChat.Model
         }
 
         public NotifyBdtpClient(IPAddress localIP): base(localIP) { }
+
+        protected override void WaitForDisconnect()
+        {
+            base.WaitForDisconnect();
+
+            Disconnected?.Invoke();
+        }
     }
 }

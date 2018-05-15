@@ -24,7 +24,6 @@ namespace BDTP
             {
                 return RemoteIP != null;
             }
-
         }
 
         /// <summary>
@@ -123,7 +122,6 @@ namespace BDTP
             if (Connected)
             {
                 return false;
-
             }
 
             try
@@ -212,7 +210,7 @@ namespace BDTP
         /// <returns>true Если удалось отправить данные; в противном случае — false.</returns>
         public virtual bool SendReceipt(byte[] data)
         {
-            if (!Connected || data.Length > BUFFER_SIZE)
+            if (data.Length > BUFFER_SIZE)
             {
                 return false;
             }
@@ -229,11 +227,6 @@ namespace BDTP
         /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
         public virtual byte[] ReceiveReceipt()
         {
-            if (!Connected)
-            {
-                return Array.Empty<byte>();
-            }
-
             NetworkStream stream = tcpController.GetStream();
             byte[] buffer = new byte[BUFFER_SIZE];
             int count;
@@ -258,6 +251,11 @@ namespace BDTP
         /// </summary>
         public virtual void Disconnect()
         {
+            if (!Connected)
+            {
+                return;
+            }
+
             RemoteIP = null;
 
             tcpListener.Stop();
@@ -267,19 +265,17 @@ namespace BDTP
             udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
         }
 
-        private void WaitForDisconnect()
+        /// <summary>
+        /// Ожидает закрытие соединения со стороны удаленного узла и позволяет повторно установить соединение.
+        /// </summary>
+        protected virtual void WaitForDisconnect()
         {
             NetworkStream stream = tcpController.GetStream();
 
             int count = 0;
             do
             {
-                byte[] buffer = new byte[256];
-                try
-                {
-                    count = stream.Read(buffer, 0, buffer.Length);
-                }
-                catch { }
+                count = ReceiveReceipt().Length;
             }
             while (count != 0 && Connected);
 

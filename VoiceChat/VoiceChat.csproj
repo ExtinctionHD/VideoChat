@@ -76,6 +76,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Talk.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\WaitCall.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -97,6 +101,9 @@
     </Compile>
     <Compile Include="View\OutcomingCall.xaml.cs">
       <DependentUpon>OutcomingCall.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Talk.xaml.cs">
+      <DependentUpon>Talk.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WaitCall.xaml.cs">
       <DependentUpon>WaitCall.xaml</DependentUpon>

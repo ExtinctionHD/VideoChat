@@ -92,6 +92,8 @@ namespace VoiceChat.Model
         public VoiceChatModel()
         {
             bdtpClient = new NotifyBdtpClient(GetLocalIP());
+            bdtpClient.Disconnected += () => EndCall();
+
             InitializeAudio();
 
             BeginWaitCall();
@@ -117,29 +119,31 @@ namespace VoiceChat.Model
         }
 
         // Исходящий вызов
-        public async void BeginCall()
+        public void BeginCall()
         {
             State = States.OutcomingCall;
-            await Task.Run(() =>
-            {
-                EndWaitCall();
+            EndWaitCall();
 
-                // Подключение о ожидание ответа
-                if (bdtpClient.Connect(remoteIP) && WaitAccept())
-                {
-                    BeginTalk();
-                }
-                else
-                {
-                    EndCall();
-                }
-            });
+            // Подключение о ожидание ответа
+            if (bdtpClient.Connect(remoteIP) && WaitAccept())
+            {
+                BeginTalk();
+            }
+            else
+            {
+                EndCall();
+            }
         }
         private bool WaitAccept()
         {
             try
             {
-                while (bdtpClient.ReceiveReceipt() != new byte[] { (byte)Receipts.Accept }) ;
+                byte[] receipt;
+                do
+                {
+                    receipt = bdtpClient.ReceiveReceipt();
+                }
+                while (receipt[0] != (byte)Receipts.Accept && receipt.Length == 1);
             }
             catch { return false; }
 
@@ -174,7 +178,8 @@ namespace VoiceChat.Model
         private void BeginWaitCall()
         {
             State = States.WaitCall;
-            
+
+            Thread.Sleep(10);
             waitCall = new Thread(WaitCall);
             waitCall.Start();
         }
@@ -187,8 +192,11 @@ namespace VoiceChat.Model
         {
             if (bdtpClient.Accept())
             {
+                RemoteIP = bdtpClient.RemoteIP;
+                
                 State = States.IncomingCall;
             }
+            EndWaitCall();
         }
 
         // Разговор
@@ -196,14 +204,14 @@ namespace VoiceChat.Model
         {
             State = States.Talk;
 
-            // Передача звука
-            input.DataAvailable += SendVoice;
-            input.StartRecording();
+            //// Передача звука
+            //input.DataAvailable += SendVoice;
+            //input.StartRecording();
 
-            // Принятие звука
-            output.Play();
-            receiveVoice = new Thread(ReceiveVoice);
-            receiveVoice.Start();
+            //// Принятие звука
+            //output.Play();
+            //receiveVoice = new Thread(ReceiveVoice);
+            //receiveVoice.Start();
         }
         private void EndTalk()
         {

@@ -34,5 +34,7 @@
                             Visibility="{Binding OutcomingCall, Converter={StaticResource BoolToVis}}"/>
         <View:IncomingCall Grid.ColumnSpan="3"
                            Visibility="{Binding IncomingCall, Converter={StaticResource BoolToVis}}"/>
+        <View:Talk Grid.ColumnSpan="3"
+                           Visibility="{Binding Talk, Converter={StaticResource BoolToVis}}"/>
     </Grid>
 </Window>
