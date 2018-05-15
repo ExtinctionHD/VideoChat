@@ -88,7 +88,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Model\NotifyBdtpClient.cs" />
     <Compile Include="Model\VoiceChatModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\VoiceChatVM.cs" />

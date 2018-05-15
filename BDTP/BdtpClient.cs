@@ -76,7 +76,7 @@ namespace BDTP
         public int ReceiverPort { get; private set; } = 11002;
 
         /// <summary>
-        /// 
+        /// Происходит при приеме подтверждения со стороны удаленного узла
         /// </summary>
         public event Action<byte[]> ReceiptReceived;
 
@@ -225,12 +225,8 @@ namespace BDTP
 
             return true;
         }
-
-        /// <summary>
-        /// Возвращает подтверждение, которое было отправлено со связанного узла по протоколу TCP.
-        /// </summary>
-        /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
-        public virtual byte[] ReceiveReceipt()
+        
+        private byte[] ReceiveReceipt()
         {
             NetworkStream stream = tcpController.GetStream();
             byte[] buffer = new byte[BUFFER_SIZE];
@@ -269,11 +265,8 @@ namespace BDTP
             udpReceiver.Close();
             udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
         }
-
-        /// <summary>
-        /// Ожидает закрытие соединения со стороны удаленного узла и позволяет повторно установить соединение.
-        /// </summary>
-        protected virtual void WaitReceipt()
+        
+        private void WaitReceipt()
         {
             int count = 0;
             do

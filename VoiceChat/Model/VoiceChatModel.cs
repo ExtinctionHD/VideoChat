@@ -18,6 +18,7 @@ using System.Net.Sockets;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using System.ComponentModel;
+using BDTP;
 
 namespace VoiceChat.Model
 {
@@ -39,7 +40,7 @@ namespace VoiceChat.Model
             Close
         }
 
-        private NotifyBdtpClient bdtpClient;
+        private BdtpClient bdtpClient;
         private Thread waitCall;
         private Thread receiveVoice;
         
@@ -92,7 +93,7 @@ namespace VoiceChat.Model
         
         public VoiceChatModel()
         {
-            bdtpClient = new NotifyBdtpClient(GetLocalIP());
+            bdtpClient = new BdtpClient(GetLocalIP());
 
             InitializeEvents();
             InitializeAudio();
@@ -205,9 +206,8 @@ namespace VoiceChat.Model
                 return;
             }
 
-            State = States.WaitCall;
+            Thread.Sleep(100);
 
-            Thread.Sleep(10);
             waitCall = new Thread(WaitCall);
             waitCall.Start();
         }
@@ -218,12 +218,15 @@ namespace VoiceChat.Model
         }
         private void WaitCall()
         {
+            State = States.WaitCall;
+
             if (bdtpClient.Accept())
             {
                 RemoteIP = bdtpClient.RemoteIP;
                 
                 State = States.IncomingCall;
             }
+
             EndWaitCall();
         }
 
@@ -232,14 +235,14 @@ namespace VoiceChat.Model
         {
             State = States.Talk;
 
-            //// Передача звука
-            //input.DataAvailable += SendVoice;
-            //input.StartRecording();
+            // Передача звука
+            input.DataAvailable += SendVoice;
+            input.StartRecording();
 
-            //// Принятие звука
-            //output.Play();
-            //receiveVoice = new Thread(ReceiveVoice);
-            //receiveVoice.Start();
+            // Принятие звука
+            output.Play();
+            receiveVoice = new Thread(ReceiveVoice);
+            receiveVoice.Start();
         }
         private void EndTalk()
         {
