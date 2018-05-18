@@ -81,9 +81,15 @@ namespace VoiceChat.Model
             {
                 state = value;
                 OnPropertyChanged("State");
+
+                ControlMedia(ringtone, States.IncomingCall);
+                ControlMedia(dialtone, States.OutcomingCall);
             }
         }
         private States state;
+
+        private MediaPlayer ringtone;
+        private MediaPlayer dialtone;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string PropertyName)
@@ -97,16 +103,17 @@ namespace VoiceChat.Model
 
             InitializeEvents();
             InitializeAudio();
+            InitializeMedia();
 
             BeginWaitCall();
         }
 
+        // Инициализация
         private void InitializeEvents()
         {
             bdtpClient.ReceiptReceived += ReceiveAccept;
             bdtpClient.ReceiptReceived += ReceiveDisconnect;
         }
-
         private void InitializeAudio()
         {
             // Cоздаем поток для записи нашей речи определяем его формат - 
@@ -119,6 +126,41 @@ namespace VoiceChat.Model
             bufferStream = new BufferedWaveProvider(new WaveFormat(8000, 16, 1));
             output.Init(bufferStream);
         }
+        private void InitializeMedia()
+        {
+            LoadMedia(ref ringtone, "Media/ringtone.mp3");
+
+            LoadMedia(ref dialtone, "Media/dialtone.mp3");
+            dialtone.Volume = 0.1;
+        }
+
+        // Звуки
+        private void LoadMedia(ref MediaPlayer media, string path)
+        {
+            media = new MediaPlayer();
+            media.Open(new Uri(path, UriKind.Relative));
+            media.MediaEnded += Media_Restart;
+        }
+        private void Media_Restart(object sender, EventArgs e)
+        {
+            (sender as MediaPlayer).Play();
+        }
+        private void ControlMedia(MediaPlayer media, States state)
+        {
+            if (media == null)
+            {
+                return;
+            }
+
+            if (State == state)
+            {
+                media.Dispatcher.Invoke(() => media.Play());
+            }
+            else
+            {
+                media.Dispatcher.Invoke(() => media.Stop());
+            }
+        }
 
         private IPAddress GetLocalIP()
         {
@@ -126,6 +168,7 @@ namespace VoiceChat.Model
             return addresses.Where(x => x.AddressFamily == AddressFamily.InterNetwork).Last();
         }
 
+        // Обработчики приема подтверждений
         private void ReceiveAccept(byte[] buffer)
         {
             if (buffer.Length == 1 && buffer[0] == (byte)Receipts.Accept)
@@ -133,7 +176,6 @@ namespace VoiceChat.Model
                 State = States.Talk;
             }
         }
-
         private void ReceiveDisconnect(byte[] buffer)
         {
             if (buffer.Length == 0)
