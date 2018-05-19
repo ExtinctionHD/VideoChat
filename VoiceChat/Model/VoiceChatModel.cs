@@ -35,7 +35,7 @@ namespace VoiceChat.Model
         public enum States
         {
             WaitCall,
-            OutcomingCall,
+            OutgoingCall,
             IncomingCall,
             Talk,
             Close
@@ -92,7 +92,7 @@ namespace VoiceChat.Model
                 OnPropertyChanged("State");
 
                 ControlMedia(ringtone, States.IncomingCall);
-                ControlMedia(dialtone, States.OutcomingCall);
+                ControlMedia(dialtone, States.OutgoingCall);
             }
         }
         private States state;
@@ -176,7 +176,9 @@ namespace VoiceChat.Model
         }
         private void Media_Restart(object sender, EventArgs e)
         {
-            (sender as MediaPlayer).Play();
+            MediaPlayer media = sender as MediaPlayer;
+            media.Stop();
+            media.Play();
         }
         private void ControlMedia(MediaPlayer media, States state)
         {
@@ -220,7 +222,7 @@ namespace VoiceChat.Model
         // Исходящий вызов
         public void BeginCall()
         {
-            State = States.OutcomingCall;
+            State = States.OutgoingCall;
             EndWaitCall();
 
             // Подключение и ожидание ответа

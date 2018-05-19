@@ -54,11 +54,11 @@ namespace VoiceChat.ViewModel
             }
         }
 
-        public bool OutcomingCall
+        public bool OutgoingCall
         {
             get
             {
-                return model.State == VoiceChatModel.States.OutcomingCall;
+                return model.State == VoiceChatModel.States.OutgoingCall;
             }
         }
 
@@ -125,7 +125,7 @@ namespace VoiceChat.ViewModel
         private void VM_StatesChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged("WaitCall");
-            OnPropertyChanged("OutcomingCall");
+            OnPropertyChanged("OutgoingCall");
             OnPropertyChanged("IncomingCall");
             OnPropertyChanged("Talk");
             OnPropertyChanged("RemoteIP");

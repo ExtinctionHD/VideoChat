@@ -18,9 +18,9 @@ namespace VoiceChat.View
     /// <summary>
     /// Логика взаимодействия для OutcomingCall.xaml
     /// </summary>
-    public partial class OutcomingCall : UserControl
+    public partial class OutgoingCall : UserControl
     {
-        public OutcomingCall()
+        public OutgoingCall()
         {
             InitializeComponent();
         }

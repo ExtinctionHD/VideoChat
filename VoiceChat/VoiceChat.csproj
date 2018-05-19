@@ -72,7 +72,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\OutcomingCall.xaml">
+    <Page Include="View\OutgoingCall.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -98,8 +98,8 @@
     <Compile Include="View\IncomingCall.xaml.cs">
       <DependentUpon>IncomingCall.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\OutcomingCall.xaml.cs">
-      <DependentUpon>OutcomingCall.xaml</DependentUpon>
+    <Compile Include="View\OutgoingCall.xaml.cs">
+      <DependentUpon>OutgoingCall.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Talk.xaml.cs">
       <DependentUpon>Talk.xaml</DependentUpon>

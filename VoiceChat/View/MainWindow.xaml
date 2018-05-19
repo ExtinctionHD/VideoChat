@@ -30,8 +30,8 @@
 
         <View:WaitCall Grid.ColumnSpan="3"
                        Visibility="{Binding Path=WaitCall, Converter={StaticResource BoolToVis}}"/>
-        <View:OutcomingCall Grid.ColumnSpan="3"
-                            Visibility="{Binding Path=OutcomingCall, Converter={StaticResource BoolToVis}}"/>
+        <View:OutgoingCall Grid.ColumnSpan="3"
+                            Visibility="{Binding Path=OutgoingCall, Converter={StaticResource BoolToVis}}"/>
         <View:IncomingCall Grid.ColumnSpan="3"
                            Visibility="{Binding Path=IncomingCall, Converter={StaticResource BoolToVis}}"/>
         <View:Talk Grid.ColumnSpan="3"
