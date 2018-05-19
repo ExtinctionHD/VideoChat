@@ -14,6 +14,29 @@
             <RowDefinition Height="0.6*"/>
         </Grid.RowDefinitions>
 
+        <Grid HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Call time"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       Margin="0, 5"/>
+
+            <TextBox Text="{Binding Path=CallTime, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Grid.Row="1"
+                     FontSize="28"
+                     Width="auto"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     HorizontalContentAlignment="Center"/>
+        </Grid>
+
         <!--<Image gif:ImageBehavior.AnimatedSource="Images/AnimationCyan.gif"
                gif:ImageBehavior.RepeatBehavior="Forever"
                Grid.Row="0"
@@ -33,13 +56,13 @@
 
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center"
-               Grid.Row="1">
+              Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Talk with"
+            <TextBlock Text="Talking with"
                        HorizontalAlignment="Center"
                        FontSize="16"
                        Margin="0, 5"/>

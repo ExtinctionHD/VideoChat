@@ -18,6 +18,7 @@ using System.Net.Sockets;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using System.ComponentModel;
+using System.Windows.Threading;
 using BDTP;
 
 namespace VoiceChat.Model
@@ -47,6 +48,14 @@ namespace VoiceChat.Model
         private WaveIn input;                       
         private WaveOut output;                     
         private BufferedWaveProvider bufferStream;  
+
+        public bool Connected
+        {
+            get
+            {
+                return bdtpClient.Connected;
+            }
+        }
 
         public IPAddress RemoteIP
         {
@@ -88,8 +97,25 @@ namespace VoiceChat.Model
         }
         private States state;
 
+        // Плееры звуков
         private MediaPlayer ringtone;
         private MediaPlayer dialtone;
+
+        // Время звонка
+        public TimeSpan CallTime
+        {
+            get
+            {
+                return callTime;
+            }
+            set
+            {
+                callTime = value;
+                OnPropertyChanged("CallTime");
+            }
+        }
+        private TimeSpan callTime;
+        private DispatcherTimer callTimer;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string PropertyName)
@@ -104,6 +130,7 @@ namespace VoiceChat.Model
             InitializeEvents();
             InitializeAudio();
             InitializeMedia();
+            InitializeTimers();
 
             BeginWaitCall();
         }
@@ -133,8 +160,14 @@ namespace VoiceChat.Model
             LoadMedia(ref dialtone, "Media/dialtone.mp3");
             dialtone.Volume = 0.1;
         }
+        private void InitializeTimers()
+        {
+            callTimer = new DispatcherTimer();
+            callTimer.Interval = TimeSpan.FromSeconds(1);
+            callTimer.Tick += (sender, e) => CallTime += callTimer.Interval;
+        }
 
-        // Звуки
+        // Работа со свуками
         private void LoadMedia(ref MediaPlayer media, string path)
         {
             media = new MediaPlayer();
@@ -277,6 +310,9 @@ namespace VoiceChat.Model
         {
             State = States.Talk;
 
+            callTime = new TimeSpan(0);
+            callTimer.Start();
+
             // Передача звука
             input.DataAvailable += SendVoice;
             input.StartRecording();
@@ -295,6 +331,9 @@ namespace VoiceChat.Model
             // Принятие звука
             receiveVoice?.Abort();
             output.Stop();
+
+            callTimer.Stop();
+            callTime = new TimeSpan(0);
         }
 
         // Передачи звука

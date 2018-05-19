@@ -40,6 +40,13 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Connecting to"
+                       Visibility="{Binding Path=Disconnected, Converter={StaticResource BoolToVis}}"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       Margin="0, 5"/>
+
+            <TextBlock Text="Waiting accept"
+                       Visibility="{Binding Path=Connected, Converter={StaticResource BoolToVis}}"
                        HorizontalAlignment="Center"
                        FontSize="16"
                        Margin="0, 5"/>

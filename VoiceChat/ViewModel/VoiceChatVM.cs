@@ -30,6 +30,22 @@ namespace VoiceChat.ViewModel
         // Состояния 
         #region ModelStates
 
+        public bool Connected
+        {
+            get
+            {
+                return model.Connected;
+            }
+        }
+
+        public bool Disconnected
+        {
+            get
+            {
+                return !model.Connected;
+            }
+        }
+
         public bool WaitCall
         {
             get
@@ -90,6 +106,14 @@ namespace VoiceChat.ViewModel
             }
         }
 
+        public string CallTime
+        {
+            get
+            {
+                return model.CallTime.ToString("c");
+            }
+        }
+
         public VoiceChatVM()
         {
             model = new VoiceChatModel();
@@ -105,6 +129,7 @@ namespace VoiceChat.ViewModel
             OnPropertyChanged("IncomingCall");
             OnPropertyChanged("Talk");
             OnPropertyChanged("RemoteIP");
+            OnPropertyChanged("CallTime");
         }
 
         // Привязка событий к командам

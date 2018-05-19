@@ -29,12 +29,12 @@
 
 
         <View:WaitCall Grid.ColumnSpan="3"
-                       Visibility="{Binding WaitCall, Converter={StaticResource BoolToVis}}"/>
+                       Visibility="{Binding Path=WaitCall, Converter={StaticResource BoolToVis}}"/>
         <View:OutcomingCall Grid.ColumnSpan="3"
-                            Visibility="{Binding OutcomingCall, Converter={StaticResource BoolToVis}}"/>
+                            Visibility="{Binding Path=OutcomingCall, Converter={StaticResource BoolToVis}}"/>
         <View:IncomingCall Grid.ColumnSpan="3"
-                           Visibility="{Binding IncomingCall, Converter={StaticResource BoolToVis}}"/>
+                           Visibility="{Binding Path=IncomingCall, Converter={StaticResource BoolToVis}}"/>
         <View:Talk Grid.ColumnSpan="3"
-                           Visibility="{Binding Talk, Converter={StaticResource BoolToVis}}"/>
+                           Visibility="{Binding Path=Talk, Converter={StaticResource BoolToVis}}"/>
     </Grid>
 </Window>
