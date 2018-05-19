@@ -8,7 +8,7 @@ namespace BDTP
     /// <summary>
     /// Предоставляет сетевые службы по протоколу BDTP (Babey Duplex Transmission Protocol)
     /// </summary>
-    public class BdtpClient
+    public class BdtpClient: IDisposable
     {
         /// <summary>
         /// Представляет размер буфера для подтверждений
@@ -247,6 +247,19 @@ namespace BDTP
             return result;
         }
 
+        private void WaitReceipt()
+        {
+            int count = 0;
+            do
+            {
+                byte[] buffer = ReceiveReceipt();
+                count = buffer.Length;
+
+                ReceiptReceived(buffer);
+            }
+            while (Connected);
+        }
+
         /// <summary>
         /// Закрывает подключение с текущим удаленным узлом и позволяет повторно установить соединение.
         /// </summary>
@@ -265,18 +278,18 @@ namespace BDTP
             udpReceiver.Close();
             udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
         }
-        
-        private void WaitReceipt()
-        {
-            int count = 0;
-            do
-            {
-                byte[] buffer = ReceiveReceipt();
-                count = buffer.Length;
 
-                ReceiptReceived(buffer);
-            }
-            while (Connected);
+        /// <summary>
+        /// Освобождает все управляемые и неуправляемые ресурсы, используемые BdtpClient.
+        /// </summary>
+        public void Dispose()
+        {
+            RemoteIP = null;
+
+            tcpController.Dispose();
+            udpReceiver.Dispose();
+            udpSender.Dispose();
+            tcpListener.Stop();
         }
     }
 }

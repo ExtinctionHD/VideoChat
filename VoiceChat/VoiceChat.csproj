@@ -155,5 +155,9 @@
   <ItemGroup>
     <Resource Include="View\Images\AnimationCyan.gif" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\dialtone.mp3" />
+    <Content Include="Source\ringtone.mp3" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

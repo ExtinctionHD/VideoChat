@@ -155,9 +155,9 @@ namespace VoiceChat.Model
         }
         private void InitializeMedia()
         {
-            LoadMedia(ref ringtone, "Media/ringtone.mp3");
+            LoadMedia(ref ringtone, "../../Source/ringtone.mp3");
 
-            LoadMedia(ref dialtone, "Media/dialtone.mp3");
+            LoadMedia(ref dialtone, "../../Source/dialtone.mp3");
             dialtone.Volume = 0.1;
         }
         private void InitializeTimers()
@@ -365,6 +365,8 @@ namespace VoiceChat.Model
             State = States.Close;
             bdtpClient.Disconnect();
             EndWaitCall();
+
+            bdtpClient.Dispose();
         }
     }
 }
