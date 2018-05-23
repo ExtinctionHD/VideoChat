@@ -13,7 +13,7 @@
         Width="720"
         Height="490"
         FontSize="20"
-        Background="#FF1D1E23">
+        Background="#FF1D1C21">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

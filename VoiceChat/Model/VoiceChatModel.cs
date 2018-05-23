@@ -155,9 +155,9 @@ namespace VoiceChat.Model
         }
         private void InitializeMedia()
         {
-            LoadMedia(ref ringtone, "../../Source/ringtone.mp3");
+            LoadMedia(ref ringtone, "Source/Ringtone.mp3");
 
-            LoadMedia(ref dialtone, "../../Source/dialtone.mp3");
+            LoadMedia(ref dialtone, "Source/Dialtone.mp3");
             dialtone.Volume = 0.1;
         }
         private void InitializeTimers()
@@ -291,7 +291,9 @@ namespace VoiceChat.Model
         private void EndWaitCall()
         {
             bdtpClient.StopAccept();
-            waitCall?.Abort();
+            waitCall.Interrupt();
+            waitCall.Abort();
+            waitCall.Join();
         }
         private void WaitCall()
         {

@@ -150,14 +150,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="View\Images\Outgoing.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\Dialtone.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Ringtone.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="View\Images\Incoming.gif" />
     <Resource Include="View\Images\Bg.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="View\Images\AnimationCyan.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Source\dialtone.mp3" />
-    <Content Include="Source\ringtone.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
