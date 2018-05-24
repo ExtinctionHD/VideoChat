@@ -14,6 +14,7 @@
             <RowDefinition Height="0.6*"/>
         </Grid.RowDefinitions>
 
+
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center" >
             <Grid.RowDefinitions>

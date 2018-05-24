@@ -159,6 +159,7 @@
     <Content Include="Source\Ringtone.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="View\Images\wolf.jpg" />
     <Resource Include="View\Images\Incoming.gif" />
     <Resource Include="View\Images\Bg.jpg" />
   </ItemGroup>
