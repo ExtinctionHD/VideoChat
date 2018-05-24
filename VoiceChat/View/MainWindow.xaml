@@ -9,7 +9,7 @@
         TextElement.FontWeight="Normal"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MateriaDesign.Wpf;component/Resources/Roboto/#Roboto"
-        Title="MainWindow"
+        Title="Voice Chat"
         Width="720"
         Height="490"
         FontSize="20">
