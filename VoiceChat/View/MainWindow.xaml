@@ -12,32 +12,21 @@
         Title="MainWindow"
         Width="720"
         Height="490"
-        FontSize="20"
-        Background="#FF1D1C21">
+        FontSize="20">
+    <Window.Background>
+        <ImageBrush ImageSource="Images/Background.jpg" Stretch="UniformToFill"/>
+    </Window.Background>
     <Grid>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="0.6*"/>
-            </Grid.ColumnDefinitions>
+        <Viewbox Grid.ColumnSpan="3">
+            <Grid Width="720"
+                  Height="490">
 
-            <Image HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"
-                   Grid.Column="2"
-                   Source="Images/Bg.jpg"
-                   Margin="20, 100, 20, 0"/>
-            
-            <Viewbox Grid.ColumnSpan="3">
-                <Grid Width="720"
-                      Height="490">
+                <View:WaitCall Visibility="{Binding Path=WaitCall, Converter={StaticResource BoolToVis}}"/>
+                <View:OutgoingCall Visibility="{Binding Path=OutgoingCall, Converter={StaticResource BoolToVis}}"/>
+                <View:IncomingCall Visibility="{Binding Path=IncomingCall, Converter={StaticResource BoolToVis}}"/>
+                <View:Talk Visibility="{Binding Path=Talk, Converter={StaticResource BoolToVis}}"/>
 
-                    <View:WaitCall Visibility="{Binding Path=WaitCall, Converter={StaticResource BoolToVis}}"/>
-                    <View:OutgoingCall Visibility="{Binding Path=OutgoingCall, Converter={StaticResource BoolToVis}}"/>
-                    <View:IncomingCall Visibility="{Binding Path=IncomingCall, Converter={StaticResource BoolToVis}}"/>
-                    <View:Talk Visibility="{Binding Path=Talk, Converter={StaticResource BoolToVis}}"/>
-                
-                </Grid>
-            </Viewbox>
-        </Grid>
+            </Grid>
+        </Viewbox>
     </Grid>
 </Window>

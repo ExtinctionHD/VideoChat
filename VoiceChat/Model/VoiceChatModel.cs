@@ -286,7 +286,11 @@ namespace VoiceChat.Model
             Thread.Sleep(100);
 
             waitCall = new Thread(WaitCall);
-            waitCall.Start();
+            try
+            {
+                waitCall.Start();
+            }
+            catch { }
         }
         private void EndWaitCall()
         {

@@ -11,14 +11,14 @@
     <UserControl.Resources>
         <System:Double x:Key="ButtonSide">50</System:Double>
     </UserControl.Resources>
-    <Grid Margin="0, 25">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <Grid HorizontalAlignment="Center"
-              VerticalAlignment="Center"
+              VerticalAlignment="Bottom"
               Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -42,14 +42,14 @@
 
         <Grid Grid.Row="1"
               HorizontalAlignment="Center"
-              VerticalAlignment="Center">
+              VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0"
-                  Margin="50, 25"
+                  Margin="35, 25"
                   Width="60">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60"/>
@@ -94,7 +94,7 @@
             </Grid>
 
             <Grid Grid.Column="1"
-                  Margin="50, 25"
+                  Margin="35, 25"
                   Width="60">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60"/>
