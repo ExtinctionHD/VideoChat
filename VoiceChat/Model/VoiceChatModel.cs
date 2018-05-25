@@ -23,6 +23,11 @@ using BDTP;
 
 namespace VoiceChat.Model
 {
+    // Voice Chat - это не только входящие но и исходящие вызовы
+    // Voice Chat - это общение
+    // Voice Chat - это рост
+    // Voice Chat - это свобода
+    // VOICE CHAAAAAT!!
     public class VoiceChatModel: INotifyPropertyChanged
     {
         // Подтверждения
