@@ -11,7 +11,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="1.8*"/>
             <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
         
@@ -21,7 +21,7 @@
                Height="60"
                HorizontalAlignment="Center"
                Grid.RowSpan="2"
-               Margin="0, 20, 0, 0"
+               Margin="0, 0, 0, 20"
                RenderTransformOrigin="0.5,0.5">
             <Image.RenderTransform>
                 <TransformGroup>

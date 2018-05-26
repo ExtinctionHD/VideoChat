@@ -197,15 +197,23 @@ namespace BDTP
                 return Array.Empty<byte>();
             }
 
+            IPEndPoint senderEP = null;
+            byte[] bytes = null;
             try
             {
-                IPEndPoint senderEP = null;
-                return udpReceiver.Receive(ref senderEP);
+                bytes = udpReceiver.Receive(ref senderEP);
             }
             catch
             {
-                return Array.Empty<byte>();
+                bytes = Array.Empty<byte>();
             }
+
+            if (!senderEP.Address.Equals(RemoteIP))
+            {
+                bytes = Array.Empty<byte>();
+            }
+
+            return bytes;
         }
 
         /// <summary>
@@ -249,12 +257,9 @@ namespace BDTP
 
         private void WaitReceipt()
         {
-            int count = 0;
             do
             {
                 byte[] buffer = ReceiveReceipt();
-                count = buffer.Length;
-
                 ReceiptReceived(buffer);
             }
             while (Connected);

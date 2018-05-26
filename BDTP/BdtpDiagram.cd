@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="BDTP.BdtpClient">
+    <Position X="7" Y="1" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>QIQAAAAAECAASAgAAEBBAKAFCAgAAAAQAAAAEAABAGw=</HashCode>
+      <FileName>BdtpClient.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

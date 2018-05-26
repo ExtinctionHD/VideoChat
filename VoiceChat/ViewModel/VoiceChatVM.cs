@@ -135,7 +135,7 @@ namespace VoiceChat.ViewModel
         // Привязка событий к командам
         private void InitializeCommands()
         {
-            BeginCall = new Command(BeginCall_Executed);
+            BeginCall = new Command(BeginCall_Executed, (obj) => RemoteIP != null);
             EndCall = new Command(EndCall_Executed);
             AcceptCall = new Command(AcceptCall_Executed);
             DeclineCall = new Command(DeclineCall_Executed);
