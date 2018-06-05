@@ -10,13 +10,24 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="1.8*"/>
+            <RowDefinition/>
             <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.RowSpan="2"
+               Grid.ColumnSpan="3"
+               Margin="20"
+               Source="{Binding Path=VideoFrame}"/>
 
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center"
-              Grid.Row="0">
+              Grid.Row="2"
+              Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -37,26 +48,17 @@
                      HorizontalContentAlignment="Center"/>
         </Grid>
 
-        <!--<Image gif:ImageBehavior.AnimatedSource="Images/AnimationCyan.gif"
-               gif:ImageBehavior.RepeatBehavior="Forever"
-               Grid.Row="0"
-               Height="60"
-               HorizontalAlignment="Center"
-               Margin="0, 20, 0, 0"
-               RenderTransformOrigin="0.5,0.5">
-            <Image.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="105"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </Image.RenderTransform>
-        </Image>-->
+        <Button HorizontalAlignment="Center"
+                Content="END CALL"
+                FontSize="16"
+                Grid.Row="2"
+                Grid.Column="1"
+                Command="{Binding Path=EndCall}"/>
 
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center"
-              Grid.Row="1">
+              Grid.Row="2"
+              Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -76,11 +78,5 @@
                      HorizontalAlignment="Center"
                      HorizontalContentAlignment="Center"/>
         </Grid>
-
-        <Button HorizontalAlignment="Center"
-                Content="END CALL"
-                FontSize="16"
-                Grid.Row="2"
-                Command="{Binding Path=EndCall}"/>
     </Grid>
 </UserControl>

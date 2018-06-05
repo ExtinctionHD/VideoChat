@@ -2,39 +2,39 @@
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="VoiceChat.ViewModel.VoiceChatVM">
     <Position X="8.75" Y="0.75" Width="4.75" />
-    <AssociationLine Name="AcceptCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
-      <Path>
-        <Point X="13.5" Y="2.562" />
-        <Point X="15" Y="2.562" />
-      </Path>
-    </AssociationLine>
     <AssociationLine Name="BeginCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="2.125" />
-        <Point X="15" Y="2.125" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="DeclineCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
-      <Path>
-        <Point X="13.5" Y="3" />
-        <Point X="15" Y="3" />
+        <Point X="13.5" Y="2.173" />
+        <Point X="15" Y="2.173" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="EndCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="3.438" />
-        <Point X="15" Y="3.438" />
+        <Point X="13.5" Y="3.531" />
+        <Point X="15" Y="3.531" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="AcceptCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
+      <Path>
+        <Point X="13.5" Y="2.625" />
+        <Point X="15" Y="2.625" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="DeclineCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
+      <Path>
+        <Point X="13.5" Y="3.078" />
+        <Point X="15" Y="3.078" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AgAABIAAAARCYACAIABEQAACgRgCAAAAAEAAAgAIIAA=</HashCode>
+      <HashCode>AgAABIAAAARCYACAIABEQAAKgRgCAAAAAEAAAgAIIAA=</HashCode>
       <FileName>ViewModel\VoiceChatVM.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="AcceptCall" />
       <Property Name="BeginCall" />
-      <Property Name="DeclineCall" />
       <Property Name="EndCall" />
+      <Property Name="AcceptCall" />
+      <Property Name="DeclineCall" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>

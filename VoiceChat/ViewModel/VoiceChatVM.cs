@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Media;
 using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,6 +11,14 @@ namespace VoiceChat.ViewModel
     {
         // Объект модели
         private VoiceChatModel model;
+
+        public ImageSource VideoFrame
+        {
+            get
+            {
+                return model.VideoFrame;
+            }
+        }
 
         // Состояния 
         #region ModelStates
@@ -114,6 +123,7 @@ namespace VoiceChat.ViewModel
             OnPropertyChanged("Talk");
             OnPropertyChanged("RemoteIP");
             OnPropertyChanged("CallTime");
+            OnPropertyChanged("VideoFrame");
         }
 
         // Привязка событий к командам

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:View="clr-namespace:VoiceChat.View"
         mc:Ignorable="d"
+        Background="{DynamicResource MaterialDesignPaper}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Normal"
         TextElement.FontSize="14"
@@ -13,9 +14,6 @@
         Width="720"
         Height="490"
         FontSize="20">
-    <Window.Background>
-        <ImageBrush ImageSource="Images/Background.jpg" Stretch="UniformToFill"/>
-    </Window.Background>
     <Grid>
         <Viewbox Grid.ColumnSpan="3">
             <Grid Width="720"

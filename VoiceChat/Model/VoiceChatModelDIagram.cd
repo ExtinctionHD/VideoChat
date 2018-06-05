@@ -6,19 +6,24 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
+      <Enum Name="VoiceChat.Model.VoiceChatModel.Receipts">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\VoiceChatModel.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
       <Enum Name="VoiceChat.Model.VoiceChatModel.States">
         <TypeIdentifier>
           <NewMemberFileName>Model\VoiceChatModel.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Enum Name="VoiceChat.Model.VoiceChatModel.Receipts">
+      <Enum Name="VoiceChat.Model.VoiceChatModel.Lines" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Model\VoiceChatModel.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>ANAAQIMAAgCCQACAMoBBQEAAjwgSEVAEAAJKBAAAAAg=</HashCode>
+      <HashCode>ANAAQIMAAgCCQACAM4hBQEAIjwgSEVAEAAJKBAAACAg=</HashCode>
       <FileName>Model\VoiceChatModel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />

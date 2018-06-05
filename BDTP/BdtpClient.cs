@@ -27,6 +27,11 @@ namespace BDTP
         }
 
         /// <summary>
+        /// Возвращает количество линий для передачи и приема данных.
+        /// </summary>
+        public int LineCount { get; }
+
+        /// <summary>
         /// Возвращает IP-адрес с которым установлено соединение.
         /// </summary>
         public virtual IPAddress RemoteIP
@@ -57,8 +62,8 @@ namespace BDTP
         private TcpListener tcpListener;
         private TcpClient tcpController;
 
-        private UdpClient udpSender;
-        private UdpClient udpReceiver;
+        private UdpClient[] udpSenders;
+        private UdpClient[] udpReceivers;
 
         /// <summary>
         /// Возвращает номер управляющего порта.
@@ -73,7 +78,7 @@ namespace BDTP
         /// <summary>
         /// Возвращает номер принимающего порта.
         /// </summary>
-        public int ReceiverPort { get; private set; } = 11002;
+        public int ReceiverPort { get; private set; } = 11011;
 
         /// <summary>
         /// Происходит при приеме подтверждения со стороны удаленного узла
@@ -81,30 +86,19 @@ namespace BDTP
         public event Action<byte[]> ReceiptReceived;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса BdtpClient и связывает его с заданным локальным IP-адресом.
+        /// Инициализирует новый экземпляр класса BdtpClient и связывает его с заданным локальным IP-адресом и указанным числом линий для приема и отправки данных.
         /// </summary>
         /// <param name="localIP">Объект IPAddress локального узла</param>
-        public BdtpClient(IPAddress localIP)
+        /// <param name="lineCount">Число линий для приема и передачи данных</param>
+        public BdtpClient(IPAddress localIP, int lineCount)
         {
+            if (lineCount > 10)
+            {
+                throw new OverflowException("Too many lines");
+            }
+
+            LineCount = lineCount;
             LocalIP = localIP;
-
-            InitializeClient();
-        }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса BdtpClient с заданными портами и связывает его с заданным локальным IP-адресом.
-        /// </summary>
-        /// <param name="localIP">Объект IPAddress локального узла.</param>
-        /// <param name="tcpPort">Номер управляющего порта.</param>
-        /// <param name="receiverPort">Номер порта для принятия данных.</param>
-        /// <param name="senderPort">Номер порта для отправления данных.</param>
-        public BdtpClient(IPAddress localIP, int tcpPort, int receiverPort, int senderPort)
-        {
-            LocalIP = localIP;
-
-            TcpPort = tcpPort;
-            ReceiverPort = receiverPort;
-            SenderPort = senderPort;
 
             InitializeClient();
         }
@@ -113,8 +107,15 @@ namespace BDTP
         {
             tcpListener = new TcpListener(LocalIP, TcpPort);
             tcpController = new TcpClient();
-            udpSender = new UdpClient(new IPEndPoint(LocalIP, SenderPort));
-            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
+
+            udpSenders = new UdpClient[LineCount];
+            udpReceivers = new UdpClient[LineCount];
+
+            for (int i = 0; i < LineCount; i++)
+            {
+                udpSenders[i] = new UdpClient(new IPEndPoint(LocalIP, SenderPort + i));
+                udpReceivers[i] = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort + i));
+            }
         }
 
         /// <summary>
@@ -171,26 +172,28 @@ namespace BDTP
         }
 
         /// <summary>
-        /// Отправляет байты данных по протоколу UDP, узлу, с которым установлено соединение.
+        /// Отправляет байты данных по протоколу UDP, узлу, с которым установлено соединение по линии с заданным индексом.
         /// </summary>
         /// <param name="data">Массив объектов типа byte, содержащий данные для отправки.</param>
+        /// <param name="index">Индекс линии по которой необходимо отправить данные.</param>
         /// <returns>Число успешно отправленных байтов</returns>
-        public virtual int Send(byte[] data)
+        public virtual int Send(byte[] data, int index)
         {
             if (!Connected)
             {
                 return 0;
             }
 
-            IPEndPoint remoteEP = new IPEndPoint(RemoteIP, ReceiverPort);
-            return udpSender.Send(data, data.Length, remoteEP);
+            IPEndPoint remoteEP = new IPEndPoint(RemoteIP, ReceiverPort + index);
+            return udpSenders[index].Send(data, data.Length, remoteEP);
         }
 
         /// <summary>
-        /// Возвращает данные, которые были отправлены со связанного узла по протоколу UDP.
+        /// Возвращает данные, которые были отправлены со связанного узла по указанной линии по протоколу UDP.
         /// </summary>
+        /// <param name="index">Индекс линии с которой необходимо принять данные.</param>
         /// <returns>Массив объектов типа byte содержащий полученные данные.</returns>
-        public virtual byte[] Receive()
+        public virtual byte[] Receive(int index)
         {
             if (!Connected)
             {
@@ -201,14 +204,14 @@ namespace BDTP
             byte[] bytes = null;
             try
             {
-                bytes = udpReceiver.Receive(ref senderEP);
+                bytes = udpReceivers[index].Receive(ref senderEP);
             }
             catch
             {
                 bytes = Array.Empty<byte>();
             }
 
-            if (!senderEP.Address.Equals(RemoteIP))
+            if (senderEP?.Address.Equals(RemoteIP) != true)
             {
                 bytes = Array.Empty<byte>();
             }
@@ -280,8 +283,11 @@ namespace BDTP
             tcpListener.Stop();
             tcpController.Close();
 
-            udpReceiver.Close();
-            udpReceiver = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort));
+            for (int i = 0; i < LineCount; i++)
+            {
+                udpReceivers[i].Close();
+                udpReceivers[i] = new UdpClient(new IPEndPoint(LocalIP, ReceiverPort + i));
+            }
         }
 
         /// <summary>
@@ -292,8 +298,13 @@ namespace BDTP
             RemoteIP = null;
 
             tcpController.Dispose();
-            udpReceiver.Dispose();
-            udpSender.Dispose();
+            
+            for (int i = 0; i < LineCount; i++)
+            {
+                udpReceivers[i].Dispose();
+                udpSenders[i].Dispose();
+            }
+
             tcpListener.Stop();
         }
     }

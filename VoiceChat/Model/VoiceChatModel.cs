@@ -1,6 +1,9 @@
 ﻿using BDTP;
 using NAudio.Wave;
 using System;
+using System.IO;
+using System.Drawing;
+using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
@@ -8,6 +11,23 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AForge.Video;
+using AForge.Video.DirectShow;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace VoiceChat.Model
 {
@@ -34,13 +54,25 @@ namespace VoiceChat.Model
             Close
         }
 
+        private enum Lines
+        {
+            Audio,
+            Video
+        }
+
+        private const int LINES_COUNT = 2;
+
         private BdtpClient bdtpClient;
         private Thread waitCall;
         private Thread receiveVoice;
+        private Thread receiveVideo;
         
         private WaveIn input;                       
         private WaveOut output;                     
-        private BufferedWaveProvider bufferStream;  
+        private BufferedWaveProvider bufferStream;
+
+        private VideoCaptureDevice videoDevice;
+        public ImageSource VideoFrame { get; set; }
 
         public bool Connected
         {
@@ -118,10 +150,11 @@ namespace VoiceChat.Model
         
         public VoiceChatModel()
         {
-            bdtpClient = new BdtpClient(GetLocalIP());
+            bdtpClient = new BdtpClient(GetLocalIP(), LINES_COUNT);
 
             InitializeEvents();
             InitializeAudio();
+            InitializeVideo();
             InitializeMedia();
             InitializeTimers();
 
@@ -145,6 +178,14 @@ namespace VoiceChat.Model
             output = new WaveOut();
             bufferStream = new BufferedWaveProvider(new WaveFormat(8000, 16, 1));
             output.Init(bufferStream);
+        }
+        private void InitializeVideo()
+        {
+            FilterInfoCollection videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            if (videoDevices.Count != 0)
+            {
+                videoDevice = new VideoCaptureDevice(videoDevices[0].MonikerString);
+            }
         }
         private void InitializeMedia()
         {
@@ -179,15 +220,18 @@ namespace VoiceChat.Model
             {
                 return;
             }
-
-            if (State == state)
+            try
             {
-                media.Dispatcher.Invoke(() => media.Play());
+                if (State == state)
+                {
+                    media.Dispatcher.Invoke(() => media.Play());
+                }
+                else
+                {
+                    media.Dispatcher.Invoke(() => media.Stop());
+                }
             }
-            else
-            {
-                media.Dispatcher.Invoke(() => media.Stop());
-            }
+            catch { }
         }
 
         private IPAddress GetLocalIP()
@@ -322,22 +366,44 @@ namespace VoiceChat.Model
             output.Play();
             receiveVoice = new Thread(ReceiveVoice);
             receiveVoice.Start();
+
+            // Передача видео
+            if (videoDevice != null)
+            {
+                videoDevice.NewFrame += SendVideo;
+                videoDevice.Start();
+            }
+            
+            // Принятие видео
+            receiveVideo = new Thread(ReceiveVideo);
+            receiveVideo.Start();
         }
         private void EndTalk()
         {
-            // Передача звука
+            // Завершение передачи звука
             input.StopRecording();
             input.DataAvailable -= SendVoice;
 
-            // Принятие звука
+            // Завершение принятия звука
             receiveVoice?.Abort();
             output.Stop();
+            
+            // Завершение передачи видео
+            if (videoDevice != null)
+            {
+                videoDevice.NewFrame -= SendVideo;
+                videoDevice.SignalToStop();
+            }
+
+            // Завершение принятия видео
+            receiveVideo?.Abort();
+            VideoFrame = null;
 
             callTimer.Stop();
             callTime = new TimeSpan(0);
         }
 
-        // Передачи звука
+        // Передача и прием звука
         private void SendVoice(object sender, WaveInEventArgs e)
         {
             if (State != States.Talk)
@@ -345,26 +411,89 @@ namespace VoiceChat.Model
                 return;
             }
 
-            bdtpClient.Send(e.Buffer);
+            bdtpClient.Send(e.Buffer, (int)Lines.Audio);
         }
-        // Приема звука
         private void ReceiveVoice()
         {
-            while(bdtpClient.Connected)
+            while(bdtpClient.Connected && State != States.Close)
             {
-                byte[] data = bdtpClient.Receive();
+                byte[] data = bdtpClient.Receive((int)Lines.Audio);
                 bufferStream.AddSamples(data, 0, data.Length);
                 Thread.Sleep(0);
             }
         }
 
+        // Передача и прием видео
+        private void SendVideo(object sender, NewFrameEventArgs e)
+        {
+            if (State != States.Talk)
+            {
+                return;
+            }
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                e.Frame.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                bdtpClient.Send(stream.ToArray(), (int)Lines.Video);
+            }
+        }
+        private void ReceiveVideo()
+        {
+            while (bdtpClient.Connected && State != States.Close)
+            {
+                byte[] data = bdtpClient.Receive((int)Lines.Video);
+
+                if (data == Array.Empty<byte>())
+                {
+                    continue;
+                }
+                
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    using (MemoryStream stream = new MemoryStream(data))
+                    {
+                        using (Bitmap frame = new Bitmap(stream))
+                        {
+
+                            try
+                            {
+                                VideoFrame = ImageSourceForBitmap(frame);
+                                OnPropertyChanged("VideoFrame");
+                            }
+                            catch { }
+                        }
+                    }
+                });
+
+                Thread.Sleep(0);
+            }
+        }
+
+        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DeleteObject([In] IntPtr hObject);
+
+        private ImageSource ImageSourceForBitmap(Bitmap bmp)
+        {
+            var handle = bmp.GetHbitmap();
+            try
+            {
+                return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+            finally { DeleteObject(handle); }
+        }
+
         // Закрытие модели
         public void Closing()
         {
+            if (State == States.Talk)
+            {
+                EndTalk();
+            }
             State = States.Close;
-            bdtpClient.Disconnect();
-            EndWaitCall();
 
+            EndCall();
             bdtpClient.Dispose();
         }
     }
