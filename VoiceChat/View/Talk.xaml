@@ -22,7 +22,7 @@
         <Image Grid.RowSpan="2"
                Grid.ColumnSpan="3"
                Margin="20"
-               Source="{Binding Path=VideoFrame}"/>
+               Source="{Binding Path=RemoteFrame}"/>
 
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center"

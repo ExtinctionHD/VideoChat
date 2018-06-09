@@ -31,48 +31,31 @@ using System.Windows.Interop;
 
 namespace VoiceChat.Model
 {
-    // Voice Chat - это не только входящие но и исходящие вызовы
-    // Voice Chat - это общение
-    // Voice Chat - это рост
-    // Voice Chat - это свобода
-    // VOICE CHAAAAAT!!
+    // Подтверждения
+    public enum Receipts
+    {
+        Accept
+    }
+
+    // Состояния модели
+    public enum ModelStates
+    {
+        WaitCall,
+        OutgoingCall,
+        IncomingCall,
+        Talk,
+        Close
+    }
+    
     public class VoiceChatModel: INotifyPropertyChanged
     {
-        // Подтверждения
-        private enum Receipts
-        {
-            Accept
-        }
-
-        // Состояния модели
-        public enum States
-        {
-            WaitCall,
-            OutgoingCall,
-            IncomingCall,
-            Talk,
-            Close
-        }
-
-        private enum Lines
-        {
-            Audio,
-            Video
-        }
-
         private const int LINES_COUNT = 2;
 
-        private BdtpClient bdtpClient;
-        private Thread waitCall;
-        private Thread receiveVoice;
-        private Thread receiveVideo;
-        
-        private WaveIn input;                       
-        private WaveOut output;                     
-        private BufferedWaveProvider bufferStream;
+        private Audio audio;
+        public Video video;
 
-        private VideoCaptureDevice videoDevice;
-        public ImageSource VideoFrame { get; set; }
+        public BdtpClient bdtpClient;
+        private Thread waitCall;
 
         public bool Connected
         {
@@ -105,7 +88,7 @@ namespace VoiceChat.Model
         }
 
         // Текущее состояние
-        public States State
+        public ModelStates State
         {
             get
             {
@@ -116,11 +99,11 @@ namespace VoiceChat.Model
                 state = value;
                 OnPropertyChanged("State");
 
-                ControlMedia(ringtone, States.IncomingCall);
-                ControlMedia(dialtone, States.OutgoingCall);
+                ControlMedia(ringtone, ModelStates.IncomingCall);
+                ControlMedia(dialtone, ModelStates.OutgoingCall);
             }
         }
-        private States state;
+        private ModelStates state;
 
         // Плееры звуков
         private MediaPlayer ringtone;
@@ -151,10 +134,11 @@ namespace VoiceChat.Model
         public VoiceChatModel()
         {
             bdtpClient = new BdtpClient(GetLocalIP(), LINES_COUNT);
+            audio = new Audio(this);
+            video = new Video(this);
 
             InitializeEvents();
-            InitializeAudio();
-            InitializeVideo();
+            
             InitializeMedia();
             InitializeTimers();
 
@@ -166,26 +150,6 @@ namespace VoiceChat.Model
         {
             bdtpClient.ReceiptReceived += ReceiveAccept;
             bdtpClient.ReceiptReceived += ReceiveDisconnect;
-        }
-        private void InitializeAudio()
-        {
-            // Cоздаем поток для записи нашей речи определяем его формат - 
-            // частота дискретизации 8000 Гц, ширина сэмпла - 16 бит, 1 канал - моно
-            input = new WaveIn();
-            input.WaveFormat = new WaveFormat(8000, 16, 1);
-
-            // Создание потока для прослушивания входящиего звука
-            output = new WaveOut();
-            bufferStream = new BufferedWaveProvider(new WaveFormat(8000, 16, 1));
-            output.Init(bufferStream);
-        }
-        private void InitializeVideo()
-        {
-            FilterInfoCollection videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            if (videoDevices.Count != 0)
-            {
-                videoDevice = new VideoCaptureDevice(videoDevices[0].MonikerString);
-            }
         }
         private void InitializeMedia()
         {
@@ -214,7 +178,7 @@ namespace VoiceChat.Model
             media.Stop();
             media.Play();
         }
-        private void ControlMedia(MediaPlayer media, States state)
+        private void ControlMedia(MediaPlayer media, ModelStates state)
         {
             if (media == null)
             {
@@ -245,7 +209,7 @@ namespace VoiceChat.Model
         {
             if (buffer.Length == 1 && buffer[0] == (byte)Receipts.Accept)
             {
-                State = States.Talk;
+                State = ModelStates.Talk;
             }
         }
         private void ReceiveDisconnect(byte[] buffer)
@@ -259,7 +223,7 @@ namespace VoiceChat.Model
         // Исходящий вызов
         public void BeginCall()
         {
-            State = States.OutgoingCall;
+            State = ModelStates.OutgoingCall;
             EndWaitCall();
 
             // Подключение и ожидание ответа
@@ -272,22 +236,9 @@ namespace VoiceChat.Model
                 EndCall();
             }
         }
-        private bool WaitAccept()
-        {
-            while (bdtpClient.Connected && State != States.Talk) ;
-            
-            if (State == States.Talk)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
         public void EndCall()
         {
-            if (State == States.Talk)
+            if (State == ModelStates.Talk)
             {
                 EndTalk();
             }
@@ -295,6 +246,19 @@ namespace VoiceChat.Model
             bdtpClient.Disconnect();
 
             BeginWaitCall();
+        }
+        private bool WaitAccept()
+        {
+            while (bdtpClient.Connected && State != ModelStates.Talk) ;
+
+            if (State == ModelStates.Talk)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // Входящий вызов
@@ -315,7 +279,7 @@ namespace VoiceChat.Model
         // Ожидание входящего вызова
         private void BeginWaitCall()
         {
-            if (State == States.Close)
+            if (State == ModelStates.Close)
             {
                 return;
             }
@@ -338,13 +302,13 @@ namespace VoiceChat.Model
         }
         private void WaitCall()
         {
-            State = States.WaitCall;
+            State = ModelStates.WaitCall;
 
             if (bdtpClient.Accept())
             {
                 RemoteIP = bdtpClient.RemoteIP;
                 
-                State = States.IncomingCall;
+                State = ModelStates.IncomingCall;
             }
 
             EndWaitCall();
@@ -353,145 +317,37 @@ namespace VoiceChat.Model
         // Разговор
         private void BeginTalk()
         {
-            State = States.Talk;
+            State = ModelStates.Talk;
 
             callTime = new TimeSpan(0);
             callTimer.Start();
-
-            // Передача звука
-            input.DataAvailable += SendVoice;
-            input.StartRecording();
-
-            // Принятие звука
-            output.Play();
-            receiveVoice = new Thread(ReceiveVoice);
-            receiveVoice.Start();
-
-            // Передача видео
-            if (videoDevice != null)
-            {
-                videoDevice.NewFrame += SendVideo;
-                videoDevice.Start();
-            }
             
-            // Принятие видео
-            receiveVideo = new Thread(ReceiveVideo);
-            receiveVideo.Start();
+            audio.BeginSend();
+            audio.BeginReceive();
+
+            video.BeginSend();
+            video.BeginReceive();
         }
         private void EndTalk()
         {
-            // Завершение передачи звука
-            input.StopRecording();
-            input.DataAvailable -= SendVoice;
+            audio.EndSend();
+            audio.EndReceive();
 
-            // Завершение принятия звука
-            receiveVoice?.Abort();
-            output.Stop();
-            
-            // Завершение передачи видео
-            if (videoDevice != null)
-            {
-                videoDevice.NewFrame -= SendVideo;
-                videoDevice.SignalToStop();
-            }
-
-            // Завершение принятия видео
-            receiveVideo?.Abort();
-            VideoFrame = null;
+            video.EndSend();
+            video.EndReceive();
 
             callTimer.Stop();
             callTime = new TimeSpan(0);
         }
 
-        // Передача и прием звука
-        private void SendVoice(object sender, WaveInEventArgs e)
-        {
-            if (State != States.Talk)
-            {
-                return;
-            }
-
-            bdtpClient.Send(e.Buffer, (int)Lines.Audio);
-        }
-        private void ReceiveVoice()
-        {
-            while(bdtpClient.Connected && State != States.Close)
-            {
-                byte[] data = bdtpClient.Receive((int)Lines.Audio);
-                bufferStream.AddSamples(data, 0, data.Length);
-                Thread.Sleep(0);
-            }
-        }
-
-        // Передача и прием видео
-        private void SendVideo(object sender, NewFrameEventArgs e)
-        {
-            if (State != States.Talk)
-            {
-                return;
-            }
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                e.Frame.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                bdtpClient.Send(stream.ToArray(), (int)Lines.Video);
-            }
-        }
-        private void ReceiveVideo()
-        {
-            while (bdtpClient.Connected && State != States.Close)
-            {
-                byte[] data = bdtpClient.Receive((int)Lines.Video);
-
-                if (data == Array.Empty<byte>())
-                {
-                    continue;
-                }
-                
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    using (MemoryStream stream = new MemoryStream(data))
-                    {
-                        using (Bitmap frame = new Bitmap(stream))
-                        {
-
-                            try
-                            {
-                                VideoFrame = ImageSourceForBitmap(frame);
-                                OnPropertyChanged("VideoFrame");
-                            }
-                            catch { }
-                        }
-                    }
-                });
-
-                Thread.Sleep(0);
-            }
-        }
-
-        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteObject([In] IntPtr hObject);
-
-        private ImageSource ImageSourceForBitmap(Bitmap bmp)
-        {
-            var handle = bmp.GetHbitmap();
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally { DeleteObject(handle); }
-        }
-
         // Закрытие модели
         public void Closing()
         {
-            if (State == States.Talk)
+            if (State == ModelStates.Talk)
             {
                 EndTalk();
             }
-            State = States.Close;
+            State = ModelStates.Close;
 
             EndCall();
             bdtpClient.Dispose();

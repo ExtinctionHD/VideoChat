@@ -4,6 +4,32 @@ using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
 using VoiceChat.Model;
+using BDTP;
+using NAudio.Wave;
+using System.IO;
+using System.Drawing;
+using System.Windows.Media.Imaging;
+using System.Linq;
+using System.Net.Sockets;
+using System.Threading;
+using System.Windows.Threading;
+using AForge.Video;
+using AForge.Video.DirectShow;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+
 
 namespace VoiceChat.ViewModel
 {
@@ -12,11 +38,18 @@ namespace VoiceChat.ViewModel
         // Объект модели
         private VoiceChatModel model;
 
-        public ImageSource VideoFrame
+        public ImageSource RemoteFrame
         {
             get
             {
-                return model.VideoFrame;
+                return model.video.RemoteFrame;
+            }
+        }
+        public ImageSource LocalFrame
+        {
+            get
+            {
+                return model.video.LocalFrame;
             }
         }
 
@@ -43,7 +76,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.WaitCall;
+                return model.State == ModelStates.WaitCall;
             }
         }
 
@@ -51,7 +84,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.OutgoingCall;
+                return model.State == ModelStates.OutgoingCall;
             }
         }
 
@@ -59,7 +92,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.IncomingCall;
+                return model.State == ModelStates.IncomingCall;
             }
         }
 
@@ -67,7 +100,7 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.State == VoiceChatModel.States.Talk;
+                return model.State == ModelStates.Talk;
             }
         }
 
@@ -110,12 +143,12 @@ namespace VoiceChat.ViewModel
         public VoiceChatVM()
         {
             model = new VoiceChatModel();
-            model.PropertyChanged += VM_StatesChanged;
+            model.PropertyChanged += VM_PropertyChanged;
 
             InitializeCommands();
         }
 
-        private void VM_StatesChanged(object sender, PropertyChangedEventArgs e)
+        private void VM_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged("WaitCall");
             OnPropertyChanged("OutgoingCall");
@@ -123,7 +156,8 @@ namespace VoiceChat.ViewModel
             OnPropertyChanged("Talk");
             OnPropertyChanged("RemoteIP");
             OnPropertyChanged("CallTime");
-            OnPropertyChanged("VideoFrame");
+            OnPropertyChanged("RemoteFrame");
+            OnPropertyChanged("LocalFrame");
         }
 
         // Привязка событий к командам
