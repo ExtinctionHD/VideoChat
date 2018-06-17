@@ -4,30 +4,30 @@
     <Position X="8.75" Y="0.75" Width="4.75" />
     <AssociationLine Name="BeginCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="2.086" />
-        <Point X="15" Y="2.086" />
+        <Point X="13.5" Y="2.129" />
+        <Point X="15" Y="2.129" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="EndCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="3.361" />
-        <Point X="15" Y="3.361" />
+        <Point X="13.5" Y="3.446" />
+        <Point X="15" Y="3.446" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="AcceptCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="2.511" />
-        <Point X="15" Y="2.511" />
+        <Point X="13.5" Y="2.568" />
+        <Point X="15" Y="2.568" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="DeclineCall" Type="VoiceChat.ViewModel.Command" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="2.936" />
-        <Point X="15" Y="2.936" />
+        <Point X="13.5" Y="3.007" />
+        <Point X="15" Y="3.007" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AgAARIAAAARGYACAIEBEQAACgRgCAAAAAEAAAgAIAAA=</HashCode>
+      <HashCode>AgAARIAAAATGYACAIEBEQAACgRgCAAAAAEAAAgAIAAA=</HashCode>
       <FileName>ViewModel\VoiceChatVM.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>

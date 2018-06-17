@@ -46,13 +46,13 @@ namespace VoiceChat.Model
         Talk,
         Close
     }
-    
-    public class VoiceChatModel: INotifyPropertyChanged
+
+    public class VoiceChatModel : INotifyPropertyChanged
     {
         private const int LINES_COUNT = 2;
 
-        private Audio audio;
-        public Video video;
+        private AudioSharing audio;
+        public VideoSharing video;
 
         public BdtpClient bdtpClient;
         private Thread waitCall;
@@ -99,31 +99,14 @@ namespace VoiceChat.Model
                 state = value;
                 OnPropertyChanged("State");
 
-                ControlMedia(ringtone, ModelStates.IncomingCall);
-                ControlMedia(dialtone, ModelStates.OutgoingCall);
+                mediaSounds.ControlSounds();
             }
         }
         private ModelStates state;
 
-        // Плееры звуков
-        private MediaPlayer ringtone;
-        private MediaPlayer dialtone;
+        public CallTimer callTimer;
 
-        // Время звонка
-        public TimeSpan CallTime
-        {
-            get
-            {
-                return callTime;
-            }
-            set
-            {
-                callTime = value;
-                OnPropertyChanged("CallTime");
-            }
-        }
-        private TimeSpan callTime;
-        private DispatcherTimer callTimer;
+        private MediaSounds mediaSounds;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string PropertyName)
@@ -134,13 +117,13 @@ namespace VoiceChat.Model
         public VoiceChatModel()
         {
             bdtpClient = new BdtpClient(GetLocalIP(), LINES_COUNT);
-            audio = new Audio(this);
-            video = new Video(this);
+
+            audio = new AudioSharing(this);
+            video = new VideoSharing(this);
+            mediaSounds = new MediaSounds(this);
+            callTimer = new CallTimer();
 
             InitializeEvents();
-            
-            InitializeMedia();
-            InitializeTimers();
 
             BeginWaitCall();
         }
@@ -150,52 +133,6 @@ namespace VoiceChat.Model
         {
             bdtpClient.ReceiptReceived += ReceiveAccept;
             bdtpClient.ReceiptReceived += ReceiveDisconnect;
-        }
-        private void InitializeMedia()
-        {
-            LoadMedia(ref ringtone, "Source/Ringtone.mp3");
-
-            LoadMedia(ref dialtone, "Source/Dialtone.mp3");
-            dialtone.Volume = 0.1;
-        }
-        private void InitializeTimers()
-        {
-            callTimer = new DispatcherTimer();
-            callTimer.Interval = TimeSpan.FromSeconds(1);
-            callTimer.Tick += (sender, e) => CallTime += callTimer.Interval;
-        }
-
-        // Работа со свуками
-        private void LoadMedia(ref MediaPlayer media, string path)
-        {
-            media = new MediaPlayer();
-            media.Open(new Uri(path, UriKind.Relative));
-            media.MediaEnded += Media_Restart;
-        }
-        private void Media_Restart(object sender, EventArgs e)
-        {
-            MediaPlayer media = sender as MediaPlayer;
-            media.Stop();
-            media.Play();
-        }
-        private void ControlMedia(MediaPlayer media, ModelStates state)
-        {
-            if (media == null)
-            {
-                return;
-            }
-            try
-            {
-                if (State == state)
-                {
-                    media.Dispatcher.Invoke(() => media.Play());
-                }
-                else
-                {
-                    media.Dispatcher.Invoke(() => media.Stop());
-                }
-            }
-            catch { }
         }
 
         private IPAddress GetLocalIP()
@@ -318,8 +255,7 @@ namespace VoiceChat.Model
         private void BeginTalk()
         {
             State = ModelStates.Talk;
-
-            callTime = new TimeSpan(0);
+            
             callTimer.Start();
             
             audio.BeginSend();
@@ -337,7 +273,6 @@ namespace VoiceChat.Model
             video.EndReceive();
 
             callTimer.Stop();
-            callTime = new TimeSpan(0);
         }
 
         // Закрытие модели

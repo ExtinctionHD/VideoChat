@@ -32,13 +32,13 @@ using BDTP;
 
 namespace VoiceChat.Model
 {
-    public class Audio : Data
+    public class AudioSharing : DataSharing
     {
         private WaveIn input;
         private WaveOut output;
         private BufferedWaveProvider bufferStream;
 
-        public Audio(VoiceChatModel model) : base(model)
+        public AudioSharing(VoiceChatModel model) : base(model)
         {
             LineIndex = 0;
 

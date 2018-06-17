@@ -101,9 +101,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Model\Audio.cs" />
-    <Compile Include="Model\Data.cs" />
-    <Compile Include="Model\Video.cs" />
+    <Compile Include="Model\AudioSharing.cs" />
+    <Compile Include="Model\DataSharing.cs" />
+    <Compile Include="Model\CallTimer.cs" />
+    <Compile Include="Model\MediaSounds.cs" />
+    <Compile Include="Model\VideoSharing.cs" />
     <Compile Include="Model\VoiceChatModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\VoiceChatVM.cs" />

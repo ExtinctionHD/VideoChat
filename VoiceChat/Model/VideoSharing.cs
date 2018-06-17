@@ -32,7 +32,7 @@ using System.Drawing.Imaging;
 
 namespace VoiceChat.Model
 {
-    public class Video : Data
+    public class VideoSharing : DataSharing
     {
         private VideoCaptureDevice videoDevice;
 
@@ -58,7 +58,7 @@ namespace VoiceChat.Model
             }
         }
 
-        public Video(VoiceChatModel model) : base(model)
+        public VideoSharing(VoiceChatModel model) : base(model)
         {
             LineIndex = 1;
 

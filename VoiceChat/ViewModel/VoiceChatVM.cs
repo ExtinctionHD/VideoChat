@@ -136,28 +136,16 @@ namespace VoiceChat.ViewModel
         {
             get
             {
-                return model.CallTime.ToString("c");
+                return model.callTimer.CallTime.ToString("c");
             }
         }
 
         public VoiceChatVM()
         {
             model = new VoiceChatModel();
-            model.PropertyChanged += VM_PropertyChanged;
 
+            InitializeEvents();
             InitializeCommands();
-        }
-
-        private void VM_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged("WaitCall");
-            OnPropertyChanged("OutgoingCall");
-            OnPropertyChanged("IncomingCall");
-            OnPropertyChanged("Talk");
-            OnPropertyChanged("RemoteIP");
-            OnPropertyChanged("CallTime");
-            OnPropertyChanged("RemoteFrame");
-            OnPropertyChanged("LocalFrame");
         }
 
         // Привязка событий к командам
@@ -167,6 +155,26 @@ namespace VoiceChat.ViewModel
             EndCall = new Command(EndCall_Executed);
             AcceptCall = new Command(AcceptCall_Executed);
             DeclineCall = new Command(DeclineCall_Executed);
+        }
+
+        private void InitializeEvents()
+        {
+            model.PropertyChanged += VM_PropertyChanged;
+            model.callTimer.PropertyChanged += (sender, e) => OnPropertyChanged("CallTime");
+            model.video.PropertyChanged += (sender, e) =>
+            {
+                OnPropertyChanged("RemoteFrame");
+                OnPropertyChanged("LocalFrame");
+            };
+        }
+
+        private void VM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged("WaitCall");
+            OnPropertyChanged("OutgoingCall");
+            OnPropertyChanged("IncomingCall");
+            OnPropertyChanged("Talk");
+            OnPropertyChanged("RemoteIP");
         }
         
         public event PropertyChangedEventHandler PropertyChanged;

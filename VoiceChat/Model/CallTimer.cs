@@ -31,7 +31,7 @@ using System.Windows.Interop;
 
 namespace VoiceChat.Model
 {
-    public abstract class Data
+    public class CallTimer
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string PropertyName)
@@ -39,54 +39,37 @@ namespace VoiceChat.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
         }
 
-        public int LineIndex { get; set; }
-
-        private readonly VoiceChatModel model;
-
-        protected BdtpClient BdtpClient
+        public TimeSpan CallTime
         {
-            get => model.bdtpClient;
-        }
-
-        private Thread receiveThread;
-
-        public Data(VoiceChatModel model)
-        {
-            this.model = model;
-        }
-
-        public abstract void BeginSend();
-
-        public virtual void BeginReceive()
-        {
-            receiveThread = new Thread(ReceiveLoop);
-            receiveThread.Start();
-        }
-
-        public abstract void EndSend();
-
-        public virtual void EndReceive()
-        {
-            receiveThread?.Abort();
-        }
-
-        protected virtual void Send(object sender, EventArgs e)
-        {
-            if (model.State != ModelStates.Talk)
+            get
             {
-                return;
+                return callTime;
+            }
+            set
+            {
+                callTime = value;
+                OnPropertyChanged("CallTime");
             }
         }
+        private TimeSpan callTime;
+        private DispatcherTimer timer;
 
-        protected void ReceiveLoop()
+        public CallTimer()
         {
-            while (BdtpClient.Connected && model.State == ModelStates.Talk)
-            {
-                Receive();
-                Thread.Sleep(0);
-            }
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += (sender, e) => CallTime += timer.Interval;
         }
 
-        protected abstract void Receive();
+        public void Start()
+        {
+            timer.Start();
+        }
+
+        public void Stop()
+        {
+            timer.Stop();
+            CallTime = new TimeSpan(0);
+        }
     }
 }
