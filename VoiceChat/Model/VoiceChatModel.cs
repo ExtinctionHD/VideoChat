@@ -32,9 +32,11 @@ using System.Windows.Interop;
 namespace VoiceChat.Model
 {
     // Подтверждения
-    public enum Receipts
+    public enum Flags
     {
-        Accept
+        Accept,
+        BeginVideoSend,
+        EndVideoSend
     }
 
     // Состояния модели
@@ -133,6 +135,7 @@ namespace VoiceChat.Model
         {
             bdtpClient.ReceiptReceived += ReceiveAccept;
             bdtpClient.ReceiptReceived += ReceiveDisconnect;
+            bdtpClient.ReceiptReceived += video.ReceiveFlags;
         }
 
         private IPAddress GetLocalIP()
@@ -142,9 +145,13 @@ namespace VoiceChat.Model
         }
 
         // Обработчики приема подтверждений
+        public static bool IsFlag(Flags flag, byte[] buffer)
+        {
+            return buffer.Length == 1 && buffer[0] == (byte)flag;
+        }
         private void ReceiveAccept(byte[] buffer)
         {
-            if (buffer.Length == 1 && buffer[0] == (byte)Receipts.Accept)
+            if (IsFlag(Flags.Accept, buffer))
             {
                 State = ModelStates.Talk;
             }
@@ -201,7 +208,7 @@ namespace VoiceChat.Model
         // Входящий вызов
         public void AcceptCall()
         {
-            if (bdtpClient.SendReceipt(new byte[] { (byte)Receipts.Accept }))
+            if (bdtpClient.SendReceipt(new byte[] { (byte)Flags.Accept }))
             {
                 BeginTalk();
             }
@@ -261,7 +268,6 @@ namespace VoiceChat.Model
             audio.BeginSend();
             audio.BeginReceive();
 
-            video.BeginSend();
             video.BeginReceive();
         }
         private void EndTalk()
@@ -271,6 +277,7 @@ namespace VoiceChat.Model
 
             video.EndSend();
             video.EndReceive();
+            video.ClearFrames();
 
             callTimer.Stop();
         }

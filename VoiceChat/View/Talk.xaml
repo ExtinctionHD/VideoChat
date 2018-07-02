@@ -8,7 +8,127 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0.35*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="50, 8"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Path=RemoteIP}"
+                       Margin="0"
+                       VerticalAlignment="Bottom"
+                       FontWeight="Medium"
+                       FontSize="24"/>
+
+            <TextBlock Text="Calling"
+                       Grid.Column="1"
+                       Margin="5, 0, 0, 1"
+                       VerticalAlignment="Bottom"
+                       FontSize="20"/>
+
+            <TextBlock Text="{Binding Path=CallTime}"
+                       Grid.Column="2"
+                       Margin="0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       FontSize="24"/>
+
+        </Grid>
+
+        <Border Margin="50, 0"
+                Grid.Row="1"
+                ClipToBounds="True"
+                CornerRadius="15"
+              Grid.ColumnSpan="2">
+            <Image Source="{Binding Path=RemoteFrame}"
+                   Stretch="UniformToFill"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        </Border>
+
+        <Grid Margin="10"
+              Grid.Column="1"
+              Grid.RowSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="0.35*"/>
+            </Grid.RowDefinitions>
+
+            <Image Source="{Binding Path=LocalFrame}"
+                   Grid.Row="1"
+                   Stretch="UniformToFill"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Margin="50, 12"
+              HorizontalAlignment="Center"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+                    Grid.Column="0"
+                    Height="{Binding Width, RelativeSource={RelativeSource Self}}"
+                    Width="45"
+                    Margin="20, 0"
+                    Command="{Binding Path=VideoSharing}">
+                <Image Source="Images/Camera.png"
+                       Margin="9"/>
+            </Button>
+
+            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+                    Grid.Column="1"
+                    Height="{Binding Width, RelativeSource={RelativeSource Self}}"
+                    Width="45"
+                    Margin="20, 0"
+                    Command="">
+                <Image Source="Images/Micro.png"
+                       Margin="9"/>
+            </Button>
+
+            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+                    Grid.Column="2"
+                    Height="{Binding Width, RelativeSource={RelativeSource Self}}"
+                    Width="45"
+                    Margin="20, 0"
+                    Command="">
+                <Image Source="Images/Message.png"
+                       Margin="10"/>
+            </Button>
+
+            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+                    Grid.Column="3"
+                    Background="Red"
+                    BorderBrush="Red"
+                    Height="{Binding Width, RelativeSource={RelativeSource Self}}"
+                    Width="45"
+                    Margin="20, 0"
+                    Command="{Binding Path=EndCall}">
+                <Image Source="Images/Decline.png"
+                       Margin="7"/>
+            </Button>
+
+        </Grid>
+
+        <!--<Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition Height="0.8*"/>
@@ -77,6 +197,6 @@
                      VerticalAlignment="Center"
                      HorizontalAlignment="Center"
                      HorizontalContentAlignment="Center"/>
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>

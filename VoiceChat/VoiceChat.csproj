@@ -176,10 +176,13 @@
     <Content Include="Source\Ringtone.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="View\Images\Message.png" />
+    <Resource Include="View\Images\Message1.png" />
+    <Resource Include="View\Images\Camera.png" />
+    <Resource Include="View\Images\Micro.png" />
     <Resource Include="View\Images\V.ico" />
     <Resource Include="View\Images\Outgoing.gif" />
     <Resource Include="View\Images\Background.jpg" />
-    <Resource Include="View\Images\Incoming.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

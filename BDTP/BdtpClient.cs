@@ -231,8 +231,12 @@ namespace BDTP
                 return false;
             }
 
-            NetworkStream stream = tcpController.GetStream();
-            stream.Write(data, 0, data.Length);
+            try
+            {
+                NetworkStream stream = tcpController.GetStream();
+                stream.Write(data, 0, data.Length);
+            }
+            catch { return false; }
 
             return true;
         }

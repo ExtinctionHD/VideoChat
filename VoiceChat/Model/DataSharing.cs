@@ -41,6 +41,9 @@ namespace VoiceChat.Model
 
         public int LineIndex { get; set; }
 
+        public bool IsSending { get; private set; }
+        public bool IsComes { get; protected set; }
+
         private readonly VoiceChatModel model;
 
         protected BdtpClient BdtpClient
@@ -55,7 +58,13 @@ namespace VoiceChat.Model
             this.model = model;
         }
 
-        public abstract void BeginSend();
+        public virtual void BeginSend()
+        {
+            if (IsSending)
+                return;
+
+            IsSending = true;
+        }
 
         public virtual void BeginReceive()
         {
@@ -63,7 +72,13 @@ namespace VoiceChat.Model
             receiveThread.Start();
         }
 
-        public abstract void EndSend();
+        public virtual void EndSend()
+        {
+            if (!IsSending)
+                return;
+
+            IsSending = false;
+        }
 
         public virtual void EndReceive()
         {

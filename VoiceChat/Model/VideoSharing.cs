@@ -42,7 +42,14 @@ namespace VoiceChat.Model
             get => remoteFrame;
             set
             {
-                remoteFrame = value;
+                if (IsComes)
+                {
+                    remoteFrame = value;
+                }
+                else
+                {
+                    remoteFrame = null;
+                }
                 OnPropertyChanged("RemoteFrame");
             }
         }
@@ -53,7 +60,14 @@ namespace VoiceChat.Model
             get => localFrame;
             set
             {
-                localFrame = value;
+                if (IsSending)
+                {
+                    localFrame = value;
+                }
+                else
+                {
+                    localFrame = null;
+                }
                 OnPropertyChanged("LocalFrame");
             }
         }
@@ -68,14 +82,27 @@ namespace VoiceChat.Model
                 videoDevice = new VideoCaptureDevice(videoDevices[0].MonikerString);
             }
         }
+        
+        public void ReceiveFlags(byte[] buffer)
+        {
+            if (VoiceChatModel.IsFlag(Flags.BeginVideoSend, buffer))
+                IsComes = true;
+            
+            if (VoiceChatModel.IsFlag(Flags.EndVideoSend, buffer))
+                IsComes = false;
+        }
 
         public override void BeginSend()
         {
-            if (videoDevice != null)
-            {
-                videoDevice.NewFrame += Send;
-                videoDevice.Start();
-            }
+            base.BeginSend();
+
+            if (videoDevice == null)
+                return;
+
+            videoDevice.NewFrame += Send;
+            videoDevice.Start();
+
+            BdtpClient.SendReceipt(new byte[] { (byte)Flags.BeginVideoSend });
         }
 
         public override void BeginReceive()
@@ -85,17 +112,29 @@ namespace VoiceChat.Model
 
         public override void EndSend()
         {
-            if (videoDevice != null)
-            {
-                videoDevice.NewFrame -= Send;
-                videoDevice.SignalToStop();
-            }
+            base.EndSend();
+
+            if (videoDevice == null)
+                return;
+
+            videoDevice.NewFrame -= Send;
+            videoDevice.SignalToStop();
+
+            BdtpClient.SendReceipt(new byte[] { (byte)Flags.EndVideoSend });
+
+            LocalFrame = null;
         }
 
         public override void EndReceive()
         {
             base.EndReceive();
+            IsComes = false;
+        }
+
+        public void ClearFrames()
+        {
             RemoteFrame = null;
+            LocalFrame = null;
         }
 
         protected override void Send(object sender, EventArgs e)
@@ -141,7 +180,7 @@ namespace VoiceChat.Model
 
         private ImageSource BitmapToImageSource(Bitmap bitmap)
         {
-            var handle = bitmap.GetHbitmap();
+            IntPtr handle = bitmap.GetHbitmap();
             try
             {
                 return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());

@@ -55,6 +55,8 @@ namespace VoiceChat.Model
 
         public override void BeginSend()
         {
+            base.BeginSend();
+
             input.DataAvailable += Send;
             input.StartRecording();
         }
@@ -69,6 +71,8 @@ namespace VoiceChat.Model
 
         public override void EndSend()
         {
+            base.EndSend();
+
             input.StopRecording();
             input.DataAvailable -= Send;
         }

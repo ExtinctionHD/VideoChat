@@ -155,6 +155,7 @@ namespace VoiceChat.ViewModel
             EndCall = new Command(EndCall_Executed);
             AcceptCall = new Command(AcceptCall_Executed);
             DeclineCall = new Command(DeclineCall_Executed);
+            VideoSharing = new Command(VideoSharing_Executed);
         }
 
         private void InitializeEvents()
@@ -209,6 +210,20 @@ namespace VoiceChat.ViewModel
         private void DeclineCall_Executed(object parameter)
         {
             model.DeclineCall();
+        }
+
+        // Команда завершения вызова
+        public Command VideoSharing { get; set; }
+        private void VideoSharing_Executed(object parameter)
+        {
+            if (model.video.IsSending)
+            {
+                model.video.EndSend();
+            }
+            else
+            {
+                model.video.BeginSend();
+            }
         }
 
         // Закрытие приложения
