@@ -36,6 +36,11 @@ namespace VoiceChat.Model
     {
         private VideoCaptureDevice videoDevice;
 
+        public bool IsEnable
+        {
+            get => videoDevice != null;
+        }
+
         private ImageSource remoteFrame;
         public ImageSource RemoteFrame
         {

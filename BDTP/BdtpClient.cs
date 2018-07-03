@@ -158,7 +158,13 @@ namespace BDTP
             }
             catch { return false; }
 
-            RemoteIP = new IPAddress(ReceiveReceipt());
+            byte[] buffer = ReceiveReceipt();
+            if (buffer == Array.Empty<byte>())
+            {
+                return false;
+            }
+
+            RemoteIP = new IPAddress(buffer);
 
             return true;
         }

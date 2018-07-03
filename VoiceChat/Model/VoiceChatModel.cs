@@ -53,7 +53,7 @@ namespace VoiceChat.Model
     {
         private const int LINES_COUNT = 2;
 
-        private AudioSharing audio;
+        public AudioSharing audio;
         public VideoSharing video;
 
         public BdtpClient bdtpClient;

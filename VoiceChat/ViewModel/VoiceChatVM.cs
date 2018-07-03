@@ -140,9 +140,20 @@ namespace VoiceChat.ViewModel
             }
         }
 
+        private ButtonsVM buttonsVM;
+        public ImageSource CameraButton
+        {
+            get => buttonsVM.CameraButton;
+        }
+        public ImageSource MicrophoneButton
+        {
+            get => buttonsVM.MicrophoneButton;
+        }
+
         public VoiceChatVM()
         {
             model = new VoiceChatModel();
+            buttonsVM = new ButtonsVM(model);
 
             InitializeEvents();
             InitializeCommands();
@@ -155,27 +166,31 @@ namespace VoiceChat.ViewModel
             EndCall = new Command(EndCall_Executed);
             AcceptCall = new Command(AcceptCall_Executed);
             DeclineCall = new Command(DeclineCall_Executed);
-            VideoSharing = new Command(VideoSharing_Executed);
+            VideoSharing = new Command(VideoSharing_Executed, (obj) => model.video.IsEnable);
+            AudioSharing = new Command(AudioSharing_Executed);
         }
 
         private void InitializeEvents()
         {
-            model.PropertyChanged += VM_PropertyChanged;
+            model.PropertyChanged += (sender, e) =>
+            {
+                OnPropertyChanged("WaitCall");
+                OnPropertyChanged("OutgoingCall");
+                OnPropertyChanged("IncomingCall");
+                OnPropertyChanged("Talk");
+                OnPropertyChanged("RemoteIP");
+            };
             model.callTimer.PropertyChanged += (sender, e) => OnPropertyChanged("CallTime");
             model.video.PropertyChanged += (sender, e) =>
             {
                 OnPropertyChanged("RemoteFrame");
                 OnPropertyChanged("LocalFrame");
             };
-        }
-
-        private void VM_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged("WaitCall");
-            OnPropertyChanged("OutgoingCall");
-            OnPropertyChanged("IncomingCall");
-            OnPropertyChanged("Talk");
-            OnPropertyChanged("RemoteIP");
+            buttonsVM.PropertyChanged += (sender, e) =>
+            {
+                OnPropertyChanged("CameraButton");
+                OnPropertyChanged("MicrophoneButton");
+            };
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -212,18 +227,18 @@ namespace VoiceChat.ViewModel
             model.DeclineCall();
         }
 
-        // Команда завершения вызова
+        // Команда включения/выключения камеры
         public Command VideoSharing { get; set; }
         private void VideoSharing_Executed(object parameter)
         {
-            if (model.video.IsSending)
-            {
-                model.video.EndSend();
-            }
-            else
-            {
-                model.video.BeginSend();
-            }
+            model.video.SwitchSendingState();
+        }
+
+        // Команда включения/выключения микрофона
+        public Command AudioSharing { get; set; }
+        private void AudioSharing_Executed(object parameter)
+        {
+            model.audio.SwitchSendingState();
         }
 
         // Закрытие приложения

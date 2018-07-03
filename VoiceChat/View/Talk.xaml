@@ -10,7 +10,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="0.35*"/>
+            <ColumnDefinition Width="0.25*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -47,19 +47,36 @@
 
         </Grid>
 
-        <Border Margin="50, 0"
-                Grid.Row="1"
-                ClipToBounds="True"
-                CornerRadius="15"
-              Grid.ColumnSpan="2">
-            <Image Source="{Binding Path=RemoteFrame}"
-                   Stretch="UniformToFill"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-        </Border>
 
-        <Grid Margin="10"
-              Grid.Column="1"
+        <Rectangle Fill="{DynamicResource PrimaryHueLightBrush}"
+                   Grid.Row="1"
+                   Grid.ColumnSpan="2"
+                   Opacity="0.5"/>
+
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="8*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Rectangle Fill="#FF673AB7"
+                       Grid.Row="1" 
+                       Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+            <Image Source="Images/Avatar.png"
+                   Grid.Row="1"
+                   Margin="50, 0"/>
+        </Grid>
+        
+        <Image Source="{Binding Path=RemoteFrame}"
+               Margin="50, 0"
+               Grid.Row="1"
+               Grid.ColumnSpan="2"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>
+
+        <Grid Grid.Column="1"
               Grid.RowSpan="3">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -67,9 +84,10 @@
             </Grid.RowDefinitions>
 
             <Image Source="{Binding Path=LocalFrame}"
+                   Margin="0, 25, 10, 10"
                    Grid.Row="1"
                    Stretch="UniformToFill"
-                   HorizontalAlignment="Center"
+                   HorizontalAlignment="Right"
                    VerticalAlignment="Center"/>
         </Grid>
 
@@ -84,33 +102,33 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+            <Button Style="{DynamicResource MaterialDesignFloatingActionButton}"
                     Grid.Column="0"
                     Height="{Binding Width, RelativeSource={RelativeSource Self}}"
                     Width="45"
                     Margin="20, 0"
                     Command="{Binding Path=VideoSharing}">
-                <Image Source="Images/Camera.png"
+                <Image Source="{Binding Path=CameraButton}"
                        Margin="9"/>
             </Button>
 
-            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+            <Button Style="{DynamicResource MaterialDesignFloatingActionButton}"
                     Grid.Column="1"
                     Height="{Binding Width, RelativeSource={RelativeSource Self}}"
                     Width="45"
                     Margin="20, 0"
-                    Command="">
-                <Image Source="Images/Micro.png"
+                    Command="{Binding Path=AudioSharing}">
+                <Image Source="{Binding Path=MicrophoneButton}"
                        Margin="9"/>
             </Button>
 
-            <Button Style="{DynamicResource MaterialDesignFloatingActionLightButton}"
+            <Button Style="{DynamicResource MaterialDesignFloatingActionButton}"
                     Grid.Column="2"
                     Height="{Binding Width, RelativeSource={RelativeSource Self}}"
                     Width="45"
                     Margin="20, 0"
                     Command="">
-                <Image Source="Images/Message.png"
+                <Image Source="Images/Buttons/Message.png"
                        Margin="10"/>
             </Button>
 
@@ -122,7 +140,7 @@
                     Width="45"
                     Margin="20, 0"
                     Command="{Binding Path=EndCall}">
-                <Image Source="Images/Decline.png"
+                <Image Source="Images/Buttons/Decline.png"
                        Margin="7"/>
             </Button>
 

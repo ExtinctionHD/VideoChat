@@ -64,6 +64,7 @@ namespace VoiceChat.Model
                 return;
 
             IsSending = true;
+            OnPropertyChanged("IsSending");
         }
 
         public virtual void BeginReceive()
@@ -78,6 +79,7 @@ namespace VoiceChat.Model
                 return;
 
             IsSending = false;
+            OnPropertyChanged("IsSending");
         }
 
         public virtual void EndReceive()
@@ -99,6 +101,18 @@ namespace VoiceChat.Model
             {
                 Receive();
                 Thread.Sleep(0);
+            }
+        }
+
+        public void SwitchSendingState()
+        {
+            if (IsSending)
+            {
+                EndSend();
+            }
+            else
+            {
+                BeginSend();
             }
         }
 

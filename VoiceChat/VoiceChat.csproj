@@ -107,6 +107,7 @@
     <Compile Include="Model\MediaSounds.cs" />
     <Compile Include="Model\VideoSharing.cs" />
     <Compile Include="Model\VoiceChatModel.cs" />
+    <Compile Include="ViewModel\ButtonsVM.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\VoiceChatVM.cs" />
     <Compile Include="View\App.xaml.cs">
@@ -160,8 +161,8 @@
     <None Include="Config\App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="View\Images\Accept.png" />
-    <Resource Include="View\Images\Decline.png" />
+    <Resource Include="View\Images\Buttons\Accept.png" />
+    <Resource Include="View\Images\Buttons\Decline.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BDTP\BDTP.csproj">
@@ -176,10 +177,20 @@
     <Content Include="Source\Ringtone.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="View\Images\Message.png" />
-    <Resource Include="View\Images\Message1.png" />
-    <Resource Include="View\Images\Camera.png" />
-    <Resource Include="View\Images\Micro.png" />
+    <Content Include="View\Images\Buttons\MicrophoneOff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="View\Images\Buttons\MicrophoneOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="View\Images\Avatar.png" />
+    <Resource Include="View\Images\Buttons\Message.png" />
+    <Content Include="View\Images\Buttons\CameraOff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="View\Images\Buttons\CameraOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="View\Images\V.ico" />
     <Resource Include="View\Images\Outgoing.gif" />
     <Resource Include="View\Images\Background.jpg" />
